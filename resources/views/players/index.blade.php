@@ -1,16 +1,7 @@
-@extends('layouts.app', ['activePage' => 'matches.index', 'titlePage' => __('matches.title')])
+@extends('layouts.app', ['activePage' => 'players.index', 'titlePage' => __('matches.title')])
 
 @section('content')
     <div class="content">
-        <div class="container-fluid">
-            <div class="row">
-                <div class="col-md-12">
-                    <a class="text-white btn btn-primary btn-lg float-right" href="{{route('matches.add')}}">
-                        {{__('matches.create')}}
-                    </a>
-                </div>
-            </div>
-        </div>
         <div class="container-fluid">
             <div class="row">
                 <div class="col-md-12">
@@ -24,32 +15,27 @@
                     @endif
                     <div class="card">
                         <div class="card-header card-header-primary">
-                            <h4 class="card-title ">{{__('matches.title')}}</h4>
-                            <p class="card-category">{{__('matches.yourMatches')}}</p>
+                            <h4 class="card-title ">{{__('general.players')}}</h4>
+                            <p class="card-category">{{__('general.yourPlayers')}}</p>
                         </div>
                         <div class="card-body">
                             <div class="table-responsive">
                                 <table class="table">
                                     <thead class=" text-primary">
                                     <th>ID</th>
-                                    <th>Match Date</th>
-                                    <th>Place</th>
-                                    <th>Players needed</th>
+                                    <th>Name</th>
+                                    <th>Nickname</th>
                                     <th class="text-right">Actions</th>
                                     </thead>
                                     <tbody>
-                                    @foreach ($matches as $match)
+                                    @foreach ($players as $player)
                                         <tr>
-                                            <td>{{$match->id}}</td>
-                                            <td>{{\Carbon\Carbon::parse($match->when_play)->format('d/m/Y H:i')}}</td>
-                                            <td>{{$match->location->formatted_address}}</td>
-                                            <td>{{$match->num_players}}</td>
+                                            <td>{{$player->id}}</td>
+                                            <td>{{$player->user->name}}</td>
+                                            <td>{{$player->user->nickname}}</td>
                                             <td class="td-actions text-right">
-                                                <a href="{{route('matches.edit', ['id' => $match->id])}}" type="button" rel="tooltip" class="btn btn-primary btn-round">
-                                                    <i class="material-icons">edit</i>
-                                                </a>
-                                                <button type="button" rel="tooltip" class="btn btn-danger btn-round">
-                                                    <i class="material-icons">close</i>
+                                                <button type="button" rel="tooltip" class="btn btn-primary btn-round">
+                                                    <i class="material-icons">visibility</i>
                                                 </button>
                                             </td>
                                         </tr>

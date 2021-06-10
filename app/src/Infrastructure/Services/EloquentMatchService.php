@@ -23,4 +23,20 @@ class EloquentMatchService implements MatchService
             'owner_id' => $userId
         ]);
     }
+
+    public function get($matchId)
+    {
+        return Match::find($matchId);
+    }
+
+    public function update($matchId, $when_play, $genre_id, $type_id, $num_players, $cost)
+    {
+        return Match::find($matchId)->update([
+            'when_play' => $when_play,
+            'genre_id' => $genre_id,
+            'type_id' => $type_id,
+            'num_players' => $num_players,
+            'cost' => $cost,
+        ]);
+    }
 }

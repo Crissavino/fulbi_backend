@@ -39,4 +39,9 @@ class Match extends Model
     public function owner() {
         return $this->belongsTo(User::class);
     }
+
+    public function players()
+    {
+        return $this->belongsToMany(Player::class);
+    }
 }

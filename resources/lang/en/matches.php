@@ -2,8 +2,9 @@
 
 return [
     'title' => 'Matches',
-    'yourMatches' => 'There are all your matches created',
+    'yourMatches' => 'These are all your matches created',
     'create' => 'Create match',
+    'update' => 'Update match',
     'back' => 'Go back',
     'wherePlay' => "Where is it played?",
     'whenPlay' => "When is it played?",

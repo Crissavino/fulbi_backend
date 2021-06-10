@@ -1,7 +1,7 @@
-@extends('layouts.app', ['activePage' => 'matches.create', 'titlePage' => __('matches.title')])
+@extends('layouts.app', ['activePage' => 'matches.update', 'titlePage' => __('matches.title')])
 
 @section('content')
-<div class="content">
+    <div class="content">
         <div class="container-fluid">
             <div class="row">
                 <div class="col-md-12">
@@ -29,16 +29,16 @@
                     @endif
                     <div class="card">
                         <div class="card-header card-header-primary">
-                            <h4 class="card-title text-center"><b>{{strtoupper(__('matches.create'))}}</b></h4>
+                            <h4 class="card-title text-center"><b>{{strtoupper(__('matches.update'))}}</b></h4>
                         </div>
                         <div class="card-body">
-                            <form method="POST" id="form" action="{{route('matches.store')}}">
+                            <form method="POST" id="form" action="{{route('matches.update', ['id' => $match->id])}}">
                                 @csrf
                                 @METHOD('POST')
                                 <div class="row mt-5">
                                     <div class="col-12 col-md-6">
                                         <label for="wherePlay" class="label-control">{{__('matches.wherePlay')}}</label>
-                                        <input type="text" class="form-control" id="wherePlay" name="location" required>
+                                        <input type="text" class="form-control" id="wherePlay" value="{{$match->location->formatted_address}}" name="location" required>
                                     </div>
                                     <div class="col-12 col-md-6 mt-3 mt-sm-0">
                                         <label for="whenPlay" class="label-control">{{__('matches.whenPlay')}}</label>
@@ -54,7 +54,7 @@
                                             @foreach ($genres as $genre)
                                                 <div class="col-3 form-check form-check-radio">
                                                     <label class="form-check-label">
-                                                        <input class="form-check-input" required type="radio" name="genre_id" id="genre" value="{{$genre->id}}" >
+                                                        <input class="form-check-input" @if($genre->id === $match->genre->id) checked @endif required type="radio" name="genre_id" id="genre" value="{{$genre->id}}" >
                                                         {{__($genre->name_key)}}
                                                         <span class="circle">
                                                             <span class="check"></span>
@@ -72,7 +72,7 @@
                                             @foreach ($types as $type)
                                                 <div class="col-3 form-check form-check-radio">
                                                     <label class="form-check-label">
-                                                        <input class="form-check-input" required type="radio" name="type_id" id="type" value="{{$type->id}}" >
+                                                        <input class="form-check-input" @if($type->id === $match->type->id) checked @endif required type="radio" name="type_id" id="type" value="{{$type->id}}" >
                                                         {{__($type->name_key)}}
                                                         <span class="circle">
                                                             <span class="check"></span>
@@ -87,18 +87,19 @@
                                 <div class="row mt-5">
                                     <div class="col-12 col-md-6">
                                         <label for="cost" class="label-control">{{__('matches.matchCost')}}</label>
-                                        <input type="number" min="0" class="form-control" id="cost" name="cost" step=".01" required>
+                                        <input type="number" min="0" class="form-control" id="cost" value="{{$match->cost}}" name="cost" step=".01" required>
                                     </div>
                                     <div class="col-12 col-md-6 mt-3 mt-sm-0">
                                         <label for="numPlayers" class="label-control">{{__('matches.matchNumPlayers')}}</label>
-                                        <input type="number" min="1" max="40" class="form-control" id="numPlayers" name="num_players" required>
+                                        <input type="number" min="1" max="40" class="form-control" id="numPlayers" value="{{$match->num_players}}" name="num_players" required>
                                     </div>
                                 </div>
 
                                 <input name="userId" class="d-none" type="text" value="{{auth()->user()->id}}">
+                                <input name="matchId" class="d-none" type="text" value="{{$match->id}}">
 
                                 <div class="row">
-                                    <button type="submit" class="col-6 mx-auto my-5 text-white btn btn-primary btn-lg">{{__('general.create')}}</button>
+                                    <button type="submit" class="col-6 mx-auto my-5 text-white btn btn-primary btn-lg">{{__('general.update')}}</button>
                                 </div>
                             </form>
                         </div>
@@ -127,7 +128,8 @@
                 close: 'fa fa-remove'
             },
             format:'DD/MM/YYYY HH:mm',
-            minDate: new Date()
+            minDate: new Date(),
+            defaultDate: '{{$when_play}}',
         });
 
         const AK = '{{$apiKey}}'
@@ -193,6 +195,6 @@
         }
 
     </script>
-{{--    <script src="{{asset('js/createMatch.js')}}"></script>--}}
+    {{--    <script src="{{asset('js/createMatch.js')}}"></script>--}}
 @endpush
 

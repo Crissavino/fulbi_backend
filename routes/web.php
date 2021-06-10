@@ -67,6 +67,11 @@ Route::group(['middleware' => 'auth'], function () {
     Route::get('matches', ['as' => 'matches.all', 'uses' => 'MatchController@showAll']);
     Route::get('matches/create', ['as' => 'matches.add', 'uses' => 'MatchController@add']);
     Route::post('matches/add', ['as' => 'matches.store', 'uses' => 'MatchController@store']);
+    Route::get('matches/edit/{id}', ['as' => 'matches.edit', 'uses' => 'MatchController@edit']);
+    Route::post('matches/edit/{id}', ['as' => 'matches.update', 'uses' => 'MatchController@update']);
+
+    Route::get('players', ['as' => 'players.all', 'uses' => 'PlayerController@showAll']);
+
 
 });
 

@@ -13,10 +13,18 @@ return [
         'mix' => 'Mixto',
     ],
     'send' => 'Enviar',
+    'create' => 'Crear',
+    'update' => 'Actualizar',
     'positions' => [
         'gk' => 'Arquero',
         'def' => 'Defensor',
         'mid' => 'Medio',
         'for' => 'Delantero',
     ],
+    'messages' => [
+        'matchCreated' => 'Partido creado correctamente!',
+        'matchUpdated' => 'Partido actualizado correctamente!',
+    ],
+    'players' => 'Jugadores',
+    'yourPlayers' => 'Estos son todos los jugadores que estan inscriptos en tus partidos',
 ];

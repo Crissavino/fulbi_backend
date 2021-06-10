@@ -31,4 +31,19 @@ class Player extends Model
     public function location() {
         return $this->belongsTo(Location::class);
     }
+
+    public function matches()
+    {
+        return $this->belongsToMany(Match::class);
+    }
+
+    public function messages()
+    {
+        return $this->belongsToMany(Message::class);
+    }
+
+    public function positions()
+    {
+        return $this->belongsToMany(Position::class);
+    }
 }

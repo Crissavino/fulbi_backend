@@ -13,6 +13,8 @@ return [
         'mix' => 'Mix',
     ],
     'send' => 'Send',
+    'create' => 'Create',
+    'update' => 'Update',
     'positions' => [
         'gk' => 'Goalkeeper',
         'def' => 'Defense',
@@ -20,6 +22,10 @@ return [
         'for' => 'Forward',
     ],
     'messages' => [
-        'matchCreated' => 'Match created successfully!'
+        'matchCreated' => 'Match created successfully!',
+        'matchUpdated' => 'Match updated successfully!',
     ],
+    'players' => 'Players',
+    'yourPlayers' => 'These are all the players who are registered in your matches',
+
 ];

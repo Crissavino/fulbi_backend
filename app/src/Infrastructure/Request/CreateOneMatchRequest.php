@@ -6,7 +6,7 @@ namespace App\src\Infrastructure\Request;
 
 use Illuminate\Http\Request;
 
-class StoreOneMatchRequest
+class CreateOneMatchRequest
 {
     /**
      * @var Request
@@ -14,7 +14,7 @@ class StoreOneMatchRequest
     private $request;
 
     /**
-     * StoreOneMatchRequest constructor.
+     * CreateOneMatchRequest constructor.
      * @param Request $request
      */
     public function __construct(Request $request)

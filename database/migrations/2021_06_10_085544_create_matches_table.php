@@ -28,7 +28,7 @@ class CreateMatchesTable extends Migration
 
         Schema::create('match_player', function (Blueprint $table) {
             $table->id();
-            $table->integer('chat_id');
+            $table->integer('player_id');
             $table->integer('match_id');
             $table->timestampsTz();
         });

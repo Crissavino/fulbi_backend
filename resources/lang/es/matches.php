@@ -4,6 +4,7 @@ return [
     'title' => 'Partidos',
     'yourMatches' => 'Estos son todos tus partidos creados',
     'create' => 'Crear Partido',
+    'update' => 'Actualizar Partido',
     'back' => 'Volver',
     'wherePlay' => "Cuando se juega?",
     'whenPlay' => "Donde se juega?",
