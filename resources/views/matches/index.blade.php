@@ -61,6 +61,9 @@
                                     </tbody>
                                 </table>
                             </div>
+                            <div class="d-flex justify-content-center">
+                                {!! $matches->links() !!}
+                            </div>
                         </div>
                     </div>
                 </div>

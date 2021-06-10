@@ -21,7 +21,7 @@ class MatchController extends Controller
 {
     public function showAll()
     {
-        $matches = Match::where('owner_id', auth()->user()->id)->get();
+        $matches = Match::where('owner_id', auth()->user()->id)->simplePaginate(8);
         return view('matches.index', [
             'matches' => $matches
         ]);
