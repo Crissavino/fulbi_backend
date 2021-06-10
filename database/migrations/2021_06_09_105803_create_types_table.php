@@ -17,6 +17,7 @@ class CreateTypesTable extends Migration
             $table->id();
             $table->string('name_key');
             $table->integer('sport_id');
+            $table->softDeletes();
             $table->timestampsTz();
         });
     }

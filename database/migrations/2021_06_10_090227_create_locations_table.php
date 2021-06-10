@@ -24,6 +24,7 @@ class CreateLocationsTable extends Migration
             $table->string('city');
             $table->string('place_id');
             $table->string('formatted_address');
+            $table->softDeletes();
             $table->timestampsTz();
         });
     }

@@ -129,8 +129,9 @@
             },
             format:'DD/MM/YYYY HH:mm',
             minDate: new Date(),
-            defaultDate: '{{$when_play}}',
         });
+
+        $('.datetimepicker').val('{{$when_play}}')
 
         const AK = '{{$apiKey}}'
         function initialize() {

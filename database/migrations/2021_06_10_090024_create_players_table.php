@@ -18,6 +18,7 @@ class CreatePlayersTable extends Migration
             $table->integer('user_id');
             $table->integer('team_id');
             $table->integer('location_id');
+            $table->softDeletes();
             $table->timestampsTz();
         });
 

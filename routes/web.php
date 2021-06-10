@@ -69,6 +69,7 @@ Route::group(['middleware' => 'auth'], function () {
     Route::post('matches/add', ['as' => 'matches.store', 'uses' => 'MatchController@store']);
     Route::get('matches/edit/{id}', ['as' => 'matches.edit', 'uses' => 'MatchController@edit']);
     Route::post('matches/edit/{id}', ['as' => 'matches.update', 'uses' => 'MatchController@update']);
+    Route::delete('matches/delete/{id}', ['as' => 'matches.delete', 'uses' => 'MatchController@delete']);
 
     Route::get('players', ['as' => 'players.all', 'uses' => 'PlayerController@showAll']);
 

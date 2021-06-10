@@ -24,7 +24,12 @@ return [
     'messages' => [
         'matchCreated' => 'Partido creado correctamente!',
         'matchUpdated' => 'Partido actualizado correctamente!',
+        'matchDeleted' => 'Partido eliminado correctamente!',
     ],
     'players' => 'Jugadores',
     'yourPlayers' => 'Estos son todos los jugadores que estan inscriptos en tus partidos',
+    'youSure' => 'Estas seguro?',
+    'notAbleRevert' => "No será posible revertir esto!",
+    'yesDelete' => 'Si, eliminalo!',
+    'deleted' => 'Eliminado!',
 ];

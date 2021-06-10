@@ -24,8 +24,12 @@ return [
     'messages' => [
         'matchCreated' => 'Match created successfully!',
         'matchUpdated' => 'Match updated successfully!',
+        'matchDeleted' => 'Match deleted successfully!',
     ],
     'players' => 'Players',
     'yourPlayers' => 'These are all the players who are registered in your matches',
+    'youSure' => 'Are you sure?',
+    'notAbleRevert' => "You won't be able to revert this!",
+    'yesDelete' => 'Yes, delete it!',
 
 ];

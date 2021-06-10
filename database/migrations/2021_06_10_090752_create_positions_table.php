@@ -17,7 +17,8 @@ class CreatePositionsTable extends Migration
             $table->id();
             $table->string('name_key');
             $table->integer('sport_id');
-            $table->timestamps();
+            $table->softDeletes();
+            $table->timestampsTz();
         });
     }
 

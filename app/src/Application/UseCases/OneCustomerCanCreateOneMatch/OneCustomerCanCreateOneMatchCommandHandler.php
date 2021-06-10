@@ -120,7 +120,6 @@ class OneCustomerCanCreateOneMatchCommandHandler
                 'message' => __('errors.missingParameter')
             ];
         }
-        $whenPlay = \Carbon\Carbon::createFromFormat('d/m/Y H:i', $whenPlay);
 
         $genreId = intval($command->getGenreId());
         if (!$genreId) {

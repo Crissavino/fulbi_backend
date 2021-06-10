@@ -41,16 +41,20 @@
                                     @foreach ($matches as $match)
                                         <tr>
                                             <td>{{$match->id}}</td>
-                                            <td>{{\Carbon\Carbon::parse($match->when_play)->format('d/m/Y H:i')}}</td>
+                                            <td>{{$match->when_play}}</td>
                                             <td>{{$match->location->formatted_address}}</td>
                                             <td>{{$match->num_players}}</td>
                                             <td class="td-actions text-right">
                                                 <a href="{{route('matches.edit', ['id' => $match->id])}}" type="button" rel="tooltip" class="btn btn-primary btn-round">
                                                     <i class="material-icons">edit</i>
                                                 </a>
-                                                <button type="button" rel="tooltip" class="btn btn-danger btn-round">
-                                                    <i class="material-icons">close</i>
-                                                </button>
+                                                <form id="deleteForm{{$match->id}}" class="float-right ml-2" method="post" action="{{route('matches.delete', ['id' => $match->id])}}">
+                                                    @csrf
+                                                    @method('DELETE')
+                                                    <button onclick="deleteMatch({{$match->id}})" rel="tooltip" class="btn btn-danger btn-round">
+                                                        <i class="material-icons">close</i>
+                                                    </button>
+                                                </form>
                                             </td>
                                         </tr>
                                     @endforeach
@@ -64,3 +68,27 @@
         </div>
     </div>
 @endsection
+@push('js')
+    <script>
+        function deleteMatch(matchId) {
+            const form = document.getElementById('deleteForm' + matchId)
+            console.log(form)
+            form.addEventListener('submit', (event) => {
+                event.preventDefault()
+                Swal.fire({
+                    title: '{!! __('general.youSure') !!}',
+                    text: "{!! __('general.notAbleRevert') !!}",
+                    showCancelButton: true,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: '{!! __('general.yesDelete') !!}'
+                }).then((result) => {
+                    if (result) {
+                        form.submit()
+                    }
+                })
+            })
+
+        }
+    </script>
+@endpush

@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Models\Genre;
 use App\Models\Match;
-use App\Models\Player;
 use App\Models\Sport;
 use App\src\Application\UseCases\OneCustomerCanCreateOneMatch\OneCustomerCanCreateOneMatchCommand;
 use App\src\Application\UseCases\OneCustomerCanCreateOneMatch\OneCustomerCanCreateOneMatchCommandHandler;
@@ -93,7 +92,7 @@ class MatchController extends Controller
             'types' => $types,
             'genres' => $genres,
             'match' => $match,
-            'when_play' => \Carbon\Carbon::createFromFormat('Y-d-m H:i:s', $match->when_play)->format('d/m/Y H:i')
+            'when_play' => date($match->when_play)
         ]);
     }
 
@@ -131,5 +130,17 @@ class MatchController extends Controller
         }
 
         return redirect()->route('matches.all')->with('message', __('general.messages.matchUpdated'));
+    }
+
+    public function delete($id)
+    {
+        $match = Match::find($id);
+
+        $match->players()->detach();
+
+        $match->delete();
+
+        return redirect()->route('matches.all')->with('message', __('general.messages.matchDeleted'));
+
     }
 }

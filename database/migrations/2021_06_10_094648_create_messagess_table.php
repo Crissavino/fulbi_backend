@@ -19,6 +19,7 @@ class CreateMessagessTable extends Migration
             $table->integer('owner_id');
             $table->integer('chat_id');
             $table->string('language');
+            $table->softDeletes();
             $table->timestampsTz();
         });
     }
