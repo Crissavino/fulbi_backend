@@ -382,7 +382,6 @@ class MatchController extends Controller
             ]);
         }
 
-        // filtro por genero
         $genre_id = $request->genre_id;
         $matches = $matches->where('genre_id', $genre_id);
         if ($matches->count() === 0) {
