@@ -2,9 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Currency;
 use App\Models\Genre;
 use App\Models\Match;
+use App\Models\Position;
 use App\Models\Sport;
+use App\Models\Type;
 use App\src\Application\UseCases\OneCustomerCanCreateOneMatch\OneCustomerCanCreateOneMatchCommand;
 use App\src\Application\UseCases\OneCustomerCanCreateOneMatch\OneCustomerCanCreateOneMatchCommandHandler;
 use App\src\Application\UseCases\OneCustomerCanEditOneMatch\OneCustomerCanEditOneMatchCommand;
@@ -15,6 +18,7 @@ use App\src\Infrastructure\Services\EloquentChatService;
 use App\src\Infrastructure\Services\EloquentLocationService;
 use App\src\Infrastructure\Services\EloquentMatchService;
 use App\src\Infrastructure\Services\EloquentUserService;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 
 class MatchController extends Controller
@@ -34,11 +38,13 @@ class MatchController extends Controller
         $sport = Sport::where('name', 'futbol')->first();
         $types = $sport->types;
         $genres = Genre::all();
+        $currencies = Currency::all();
 
         return view('matches.create', [
             'apiKey' => $apiKey,
             'types' => $types,
             'genres' => $genres,
+            'currencies' => $currencies,
         ]);
     }
 
@@ -57,6 +63,7 @@ class MatchController extends Controller
             $requestResponse['when_play'],
             $requestResponse['genre_id'],
             $requestResponse['type_id'],
+            $requestResponse['currency_id'],
             $requestResponse['cost'],
             $requestResponse['num_players'],
             $requestResponse['locationData'],
@@ -86,13 +93,15 @@ class MatchController extends Controller
         $sport = Sport::where('name', 'futbol')->first();
         $types = $sport->types;
         $genres = Genre::all();
+        $currencies = Currency::all();
 
         return view('matches.update', [
             'apiKey' => $apiKey,
             'types' => $types,
             'genres' => $genres,
             'match' => $match,
-            'when_play' => date($match->when_play)
+            'currencies' => $currencies,
+            'when_play' => Carbon::createFromFormat('Y-m-d H:i:s', $match->when_play)->format('d/m/Y H:i')
         ]);
     }
 
@@ -110,6 +119,7 @@ class MatchController extends Controller
             $requestResponse['when_play'],
             $requestResponse['genre_id'],
             $requestResponse['type_id'],
+            $requestResponse['currency_id'],
             $requestResponse['cost'],
             $requestResponse['num_players'],
             $requestResponse['locationData'],
@@ -142,5 +152,29 @@ class MatchController extends Controller
 
         return redirect()->route('matches.all')->with('message', __('general.messages.matchDeleted'));
 
+    }
+
+    public function chat($id)
+    {
+        $match = Match::find($id);
+        $chat = $match->chat;
+        $messages = $chat->messages;
+
+        return view('matches.chat', [
+            'match' => $match,
+            'chat' => $chat,
+            'messages' => $messages,
+        ]);
+    }
+
+    public function enrolled($id)
+    {
+        $match = Match::find($id);
+        $players = $match->players;
+
+        return view('matches.enrolled', [
+            'match' => $match,
+            'players' => $players,
+        ]);
     }
 }

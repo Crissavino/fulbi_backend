@@ -19,6 +19,7 @@ class DatabaseSeeder extends Seeder
             GenresTableSeeder::class,
             TypesTableSeeder::class,
             PositionsTableSeeder::class,
+            CurrenciesTableSeeder::class,
         ]);
     }
 }

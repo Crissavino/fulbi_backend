@@ -41,7 +41,7 @@
                                     @foreach ($matches as $match)
                                         <tr>
                                             <td>{{$match->id}}</td>
-                                            <td>{{$match->when_play}}</td>
+                                            <td>{{\Carbon\Carbon::createFromFormat('Y-m-d H:i:s', $match->when_play)->format('d/m/Y H:i')}}</td>
                                             <td>{{$match->location->formatted_address}}</td>
                                             <td>{{$match->num_players}}</td>
                                             <td class="td-actions text-right">

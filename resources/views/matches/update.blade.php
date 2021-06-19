@@ -3,10 +3,20 @@
 @section('content')
     <div class="content">
         <div class="container-fluid">
-            <div class="row">
-                <div class="col-md-12">
+            <div class="row text-center">
+                <div class="col-md-4">
                     <a class="text-white btn btn-primary btn-lg" href="{{route('matches.all')}}">
                         {{__('matches.back')}}
+                    </a>
+                </div>
+                <div class="col-md-4">
+                    <a class="text-white btn btn-primary btn-lg" href="{{route('matches.chat', ['id' => $match->id])}}">
+                        {{__('matches.chat')}}
+                    </a>
+                </div>
+                <div class="col-md-4">
+                    <a class="text-white btn btn-primary btn-lg" href="{{route('matches.enrolled', ['id' => $match->id])}}">
+                        {{__('matches.enrolled')}}
                     </a>
                 </div>
             </div>
@@ -85,7 +95,14 @@
                                 </div>
 
                                 <div class="row mt-5">
-                                    <div class="col-12 col-md-6">
+                                    <div class="col-2 col-md-1">
+                                        <select class="form-control" name="currency_id" id="">
+                                            @foreach ($currencies as $currency)
+                                                <option @if($currency->id === $match->currency->id) selected @endif value="{{$currency->id}}">{{$currency->symbol}}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                    <div class="col-10 col-md-5">
                                         <label for="cost" class="label-control">{{__('matches.matchCost')}}</label>
                                         <input type="number" min="0" class="form-control" id="cost" value="{{$match->cost}}" name="cost" step=".01" required>
                                     </div>

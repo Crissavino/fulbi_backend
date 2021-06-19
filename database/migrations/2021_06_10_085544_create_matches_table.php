@@ -16,11 +16,11 @@ class CreateMatchesTable extends Migration
         Schema::create('matches', function (Blueprint $table) {
             $table->id();
             $table->integer('location_id');
-            $table->string('when_play');
+            $table->dateTime('when_play');
             $table->integer('genre_id');
             $table->integer('type_id');
             $table->integer('num_players');
-            $table->float('cost');
+            $table->double('cost', 5, 2);
             $table->integer('chat_id');
             $table->integer('owner_id');
             $table->softDeletes();

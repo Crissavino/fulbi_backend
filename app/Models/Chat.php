@@ -17,4 +17,8 @@ class Chat extends Model
     public function match() {
         return $this->belongsTo(Match::class);
     }
+
+    public function messages() {
+        return $this->hasMany(Message::class);
+    }
 }

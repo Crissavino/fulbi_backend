@@ -85,7 +85,14 @@
                                 </div>
 
                                 <div class="row mt-5">
-                                    <div class="col-12 col-md-6">
+                                    <div class="col-2 col-md-1">
+                                        <select class="form-control" name="currency_id" id="">
+                                            @foreach ($currencies as $currency)
+                                                <option value="{{$currency->id}}">{{$currency->symbol}}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                    <div class="col-10 col-md-5">
                                         <label for="cost" class="label-control">{{__('matches.matchCost')}}</label>
                                         <input type="number" min="0" class="form-control" id="cost" name="cost" step=".01" required>
                                     </div>

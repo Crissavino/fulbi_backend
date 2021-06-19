@@ -52,6 +52,13 @@ class CreateOneMatchRequest
             ];
         }
 
+        if (!$this->request->currency_id) {
+            return [
+                'success' => false,
+                'message' => __('errors.missingParameter')
+            ];
+        }
+
         if (!$this->request->num_players) {
             return [
                 'success' => false,
@@ -78,6 +85,7 @@ class CreateOneMatchRequest
             'when_play' => $this->request->when_play,
             'genre_id' => $this->request->genre_id,
             'type_id' => $this->request->type_id,
+            'currency_id' => $this->request->currency_id,
             'cost' => $this->request->cost,
             'num_players' => $this->request->num_players,
             'locationData' => $this->request->locationData,

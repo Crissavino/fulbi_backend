@@ -70,6 +70,8 @@ Route::group(['middleware' => 'auth'], function () {
     Route::get('matches/edit/{id}', ['as' => 'matches.edit', 'uses' => 'MatchController@edit']);
     Route::post('matches/edit/{id}', ['as' => 'matches.update', 'uses' => 'MatchController@update']);
     Route::delete('matches/delete/{id}', ['as' => 'matches.delete', 'uses' => 'MatchController@delete']);
+    Route::get('match/chat/{id}', ['as' => 'matches.chat', 'uses' => 'MatchController@chat']);
+    Route::get('match/enrolled/{id}', ['as' => 'matches.enrolled', 'uses' => 'MatchController@enrolled']);
 
     Route::get('players', ['as' => 'players.all', 'uses' => 'PlayerController@showAll']);
 

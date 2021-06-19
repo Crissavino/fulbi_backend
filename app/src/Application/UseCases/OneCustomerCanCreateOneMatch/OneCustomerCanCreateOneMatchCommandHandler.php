@@ -8,7 +8,7 @@ use App\src\Domain\Services\ChatService;
 use App\src\Domain\Services\LocationService;
 use App\src\Domain\Services\MatchService;
 use App\src\Domain\Services\UserService;
-use Illuminate\Support\Facades\Log;
+use Carbon\Carbon;
 
 class OneCustomerCanCreateOneMatchCommandHandler
 {
@@ -63,6 +63,7 @@ class OneCustomerCanCreateOneMatchCommandHandler
         $when_play = $parameters['when_play'];
         $genre_id = $parameters['genre_id'];
         $type_id = $parameters['type_id'];
+        $currency_id = $parameters['currency_id'];
         $cost = $parameters['cost'];
         $num_players = $parameters['num_players'];
         $locationData = $parameters['locationData'];
@@ -96,6 +97,7 @@ class OneCustomerCanCreateOneMatchCommandHandler
             $genre_id,
             $type_id,
             $num_players,
+            $currency_id,
             $cost,
             $chat->id,
             $userId
@@ -120,6 +122,7 @@ class OneCustomerCanCreateOneMatchCommandHandler
                 'message' => __('errors.missingParameter')
             ];
         }
+        $whenPlay = Carbon::createFromFormat('d/m/Y H:i', $whenPlay);
 
         $genreId = intval($command->getGenreId());
         if (!$genreId) {
@@ -139,6 +142,14 @@ class OneCustomerCanCreateOneMatchCommandHandler
 
         $cost = floatval($command->getCost());
         if (!$cost) {
+            return [
+                'success' => false,
+                'message' => __('errors.missingParameter')
+            ];
+        }
+
+        $currencyId = floatval($command->getCurrencyId());
+        if (!$currencyId) {
             return [
                 'success' => false,
                 'message' => __('errors.missingParameter')
@@ -182,6 +193,7 @@ class OneCustomerCanCreateOneMatchCommandHandler
             'when_play' => $whenPlay,
             'genre_id' => $genreId,
             'type_id' => $typeId,
+            'currency_id' => $currencyId,
             'cost' => $cost,
             'num_players' => $numPlayers,
             'locationData' => $locationData,

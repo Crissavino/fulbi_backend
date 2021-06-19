@@ -6,6 +6,8 @@ return [
     'create' => 'Crear Partido',
     'update' => 'Actualizar Partido',
     'back' => 'Volver',
+    'chat' => 'Chat',
+    'enrolled' => 'Inscriptos',
     'wherePlay' => "Cuando se juega?",
     'whenPlay' => "Donde se juega?",
     'genreType' => "Que generos juegan?",

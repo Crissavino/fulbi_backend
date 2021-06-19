@@ -17,8 +17,9 @@ class EloquentUserService implements UserService
 
     public function addOneCreatedMatch(User $user)
     {
+        $add = $user->matches_created + 1;
         $user->update([
-            'matches_created' => $user->matches_created++
+            'matches_created' => $add
         ]);
     }
 }

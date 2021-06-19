@@ -16,16 +16,16 @@ class CreatePlayersTable extends Migration
         Schema::create('players', function (Blueprint $table) {
             $table->id();
             $table->integer('user_id');
-            $table->integer('team_id');
-            $table->integer('location_id');
+            $table->integer('team_id')->nullable();
+            $table->integer('location_id')->nullable();
             $table->softDeletes();
             $table->timestampsTz();
         });
 
-        Schema::create('position_player', function (Blueprint $table) {
+        Schema::create('player_position', function (Blueprint $table) {
             $table->id();
-            $table->integer('position_id');
             $table->integer('player_id');
+            $table->integer('position_id');
             $table->timestampsTz();
         });
 
@@ -45,7 +45,7 @@ class CreatePlayersTable extends Migration
     public function down()
     {
         Schema::dropIfExists('players');
-        Schema::dropIfExists('position_player');
+        Schema::dropIfExists('player_position');
         Schema::dropIfExists('message_player');
     }
 }

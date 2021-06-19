@@ -19,9 +19,16 @@ class Match extends Model
         'cost',
         'chat_id',
         'owner_id',
+        'currency_id',
     ];
 
+    //protected $with = ['location', 'genre', 'type', 'chat', 'owner', 'players'];
+
     public function location() {
+        return $this->belongsTo(Location::class);
+    }
+
+    public function currency() {
         return $this->belongsTo(Location::class);
     }
 
@@ -45,4 +52,11 @@ class Match extends Model
     {
         return $this->belongsToMany(Player::class);
     }
+
+//    public function playersWithUser()
+//    {
+//        return $this->belongsToMany(Player::class)->with('user');
+//    }
+
+
 }

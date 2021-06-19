@@ -14,12 +14,14 @@ class OneCustomerCanEditOneMatchCommand
     private $locationData;
     private $userId;
     private $matchId;
+    private $currency_id;
 
     /**
      * OneCustomerCanEditOneMatchCommand constructor.
      * @param $when_play
      * @param $genre_id
      * @param $type_id
+     * @param $currency_id
      * @param $cost
      * @param $num_players
      * @param $locationData
@@ -30,6 +32,7 @@ class OneCustomerCanEditOneMatchCommand
         $when_play,
         $genre_id,
         $type_id,
+        $currency_id,
         $cost,
         $num_players,
         $locationData,
@@ -45,6 +48,15 @@ class OneCustomerCanEditOneMatchCommand
         $this->locationData = $locationData;
         $this->userId = $userId;
         $this->matchId = $matchId;
+        $this->currency_id = $currency_id;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getCurrencyId()
+    {
+        return $this->currency_id;
     }
 
     /**

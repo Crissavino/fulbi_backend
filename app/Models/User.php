@@ -22,9 +22,10 @@ class User extends Authenticatable
         'nickname',
         'email',
         'password',
-        'isFullySet',
+        'is_fully_set',
         'premium',
         'matches_created',
+        'genre_id',
     ];
 
     /**
@@ -48,5 +49,21 @@ class User extends Authenticatable
 
     public function matches() {
         return $this->hasMany(Match::class);
+    }
+
+    public function player() {
+        return $this->hasOne(Player::class);
+    }
+
+    public function genre() {
+        return $this->belongsTo(Genre::class);
+    }
+
+    public function scopePrueba($query) {
+        return $query->where('player.user_id', 3);
+    }
+
+    public function playerPositions() {
+        return $this->hasManyThrough(Position::class, Player::class);
     }
 }

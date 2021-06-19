@@ -21,9 +21,10 @@ class UsersTableSeeder extends Seeder
                 'email' => 'admin@material.com',
                 'email_verified_at' => now(),
                 'password' => Hash::make('secret'),
-                'isFullySet' => true,
+                'is_fully_set' => true,
                 'premium' => true,
                 'matches_created' => 0,
+                'genre_id' => 1,
                 'created_at' => now(),
                 'updated_at' => now()
             ],
@@ -33,12 +34,108 @@ class UsersTableSeeder extends Seeder
                 'email' => 'cris@test.com',
                 'email_verified_at' => now(),
                 'password' => Hash::make('123123'),
-                'isFullySet' => true,
+                'is_fully_set' => true,
                 'premium' => true,
                 'matches_created' => 0,
+                'genre_id' => 1,
                 'created_at' => now(),
                 'updated_at' => now()
             ]
+        ]);
+
+        DB::table('locations')->insert([
+            [
+                'lat' => 53.35,
+                'lng' => -6.26,
+                'country' => 'Irlanda',
+                'country_code' => 'IE',
+                'province' => 'Dublín',
+                'province_code' => 'D',
+                'city' => 'Dublín',
+                'place_id' => 'ChIJL6wn6oAOZ0gRoHExl6nHAAo',
+                'formatted_address' => 'Dublín, Irlanda',
+                'created_at' => now(),
+                'updated_at' => now()
+            ],
+            [
+                'lat' => 53.35,
+                'lng' => -6.26,
+                'country' => 'Irlanda',
+                'country_code' => 'IE',
+                'province' => 'Dublín',
+                'province_code' => 'D',
+                'city' => 'Dublín',
+                'place_id' => 'ChIJL6wn6oAOZ0gRoHExl6nHAAo',
+                'formatted_address' => 'Dublín, Irlanda',
+                'created_at' => now(),
+                'updated_at' => now()
+            ],
+        ]);
+
+        DB::table('players')->insert([
+            [
+                'user_id' => 1,
+                'location_id' => 1,
+                'created_at' => now(),
+                'updated_at' => now()
+            ],
+            [
+                'user_id' => 2,
+                'location_id' => 2,
+                'created_at' => now(),
+                'updated_at' => now()
+            ]
+        ]);
+
+        DB::table('player_position')->insert([
+            [
+                'player_id' => 1,
+                'position_id' => 1,
+                'created_at' => now(),
+                'updated_at' => now()
+            ],
+            [
+                'player_id' => 1,
+                'position_id' => 2,
+                'created_at' => now(),
+                'updated_at' => now()
+            ],
+            [
+                'player_id' => 1,
+                'position_id' => 3,
+                'created_at' => now(),
+                'updated_at' => now()
+            ],
+            [
+                'player_id' => 1,
+                'position_id' => 4,
+                'created_at' => now(),
+                'updated_at' => now()
+            ],
+            [
+                'player_id' => 2,
+                'position_id' => 1,
+                'created_at' => now(),
+                'updated_at' => now()
+            ],
+            [
+                'player_id' => 2,
+                'position_id' => 2,
+                'created_at' => now(),
+                'updated_at' => now()
+            ],
+            [
+                'player_id' => 2,
+                'position_id' => 3,
+                'created_at' => now(),
+                'updated_at' => now()
+            ],
+            [
+                'player_id' => 2,
+                'position_id' => 4,
+                'created_at' => now(),
+                'updated_at' => now()
+            ],
         ]);
     }
 }
