@@ -10,7 +10,7 @@ use App\src\Domain\Services\LocationService;
 class EloquentLocationService implements LocationService
 {
 
-    public function create($lat, $lng, $country, $country_code, $province, $province_code, $city, $place_id, $formatted_address)
+    public function create($lat, $lng, $country, $country_code, $province, $province_code, $city, $place_id, $formatted_address, $is_by_lat_lng)
     {
         return Location::create([
             'lat' => $lat,
@@ -22,10 +22,11 @@ class EloquentLocationService implements LocationService
             'city'=> $city,
             'place_id' => $place_id,
             'formatted_address'=> $formatted_address,
+            'is_by_lat_lng'=> $is_by_lat_lng,
         ]);
     }
 
-    public function update($locationId, $lat, $lng, $country, $country_code, $province, $province_code, $city, $place_id, $formatted_address)
+    public function update($locationId, $lat, $lng, $country, $country_code, $province, $province_code, $city, $place_id, $formatted_address, $is_by_lat_lng)
     {
         return Location::find($locationId)->update([
             'lat' => $lat,
@@ -37,6 +38,7 @@ class EloquentLocationService implements LocationService
             'city'=> $city,
             'place_id' => $place_id,
             'formatted_address'=> $formatted_address,
+            'is_by_lat_lng'=> $is_by_lat_lng,
         ]);
     }
 }

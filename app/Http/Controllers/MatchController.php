@@ -158,7 +158,7 @@ class MatchController extends Controller
     {
         $match = Match::find($id);
         $chat = $match->chat;
-        $messages = $chat->messages;
+        $messages = $match->chat->messages()->orderByDesc('created_at')->simplePaginate(10);
 
         return view('matches.chat', [
             'match' => $match,

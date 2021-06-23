@@ -60,7 +60,8 @@ class MatchController extends Controller
             $locationData['province_code'],
             $locationData['city'],
             $locationData['place_id'],
-            $locationData['formatted_address']
+            $locationData['formatted_address'],
+            $locationData['is_by_lat_lng']
         );
 
         $chat = (new EloquentChatService())->create();
@@ -210,7 +211,8 @@ class MatchController extends Controller
             $locationData['province_code'],
             $locationData['city'],
             $locationData['place_id'],
-            $locationData['formatted_address']
+            $locationData['formatted_address'],
+            $locationData['is_by_lat_lng']
         );
 
         $match = (new EloquentMatchService())->update(
@@ -428,12 +430,18 @@ class MatchController extends Controller
         }
         // relacionar y devolver partidos del jugador
         $match->players()->syncWithoutDetaching($user->player->id);
+        $match->location;
+        $match->cost = number_format($match->cost, 2);
+        $match->participants = $match->players->map(function ($player) use ($match) {
+            return $player->user;
+        });
 
         $matches = $this->returnAllMatches($request);
 
         return response()->json([
             'success' => true,
             'matches' => $matches->values(),
+            'match' => $match,
         ]);
     }
 

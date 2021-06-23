@@ -26,6 +26,7 @@ class User extends Authenticatable
         'premium',
         'matches_created',
         'genre_id',
+        'profile_image',
     ];
 
     /**
@@ -65,5 +66,10 @@ class User extends Authenticatable
 
     public function playerPositions() {
         return $this->hasManyThrough(Position::class, Player::class);
+    }
+
+    public function devices()
+    {
+        return $this->hasMany(Device::class);
     }
 }

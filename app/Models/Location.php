@@ -20,6 +20,7 @@ class Location extends Model
         'city',
         'place_id',
         'formatted_address',
+        'is_by_lat_lng',
     ];
 
     public function match() {

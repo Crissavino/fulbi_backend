@@ -86,7 +86,8 @@ class OneCustomerCanCreateOneMatchCommandHandler
             $locationData->province_code,
             $locationData->city,
             $locationData->place_id,
-            $locationData->formatted_address
+            $locationData->formatted_address,
+            false
         );
 
         $chat = $this->chatService->create();

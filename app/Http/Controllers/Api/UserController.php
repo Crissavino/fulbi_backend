@@ -7,9 +7,13 @@ use App\Models\Location;
 use App\Models\Position;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Http\File;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
+use Intervention\Image\Facades\Image;
 
 class UserController extends Controller
 {
@@ -167,8 +171,8 @@ class UserController extends Controller
 
         $positionsIds = $request->positions_ids;
         $users = $users
-            ->whereHas('player', function(Builder $query) use ($positionsIds) {
-                $query->whereHas('positions', function(Builder $query2) use ($positionsIds) {
+            ->whereHas('player', function (Builder $query) use ($positionsIds) {
+                $query->whereHas('positions', function (Builder $query2) use ($positionsIds) {
                     $query2->whereIn('positions.id', $positionsIds);
                 });
             });
@@ -202,7 +206,7 @@ class UserController extends Controller
         $locations = Location::select('*')
             ->having(DB::raw($distance_select), '<=', $max_distance)
             ->get();
-        $users = $users->whereHas('player', function(Builder $query) use ($locations) {
+        $users = $users->whereHas('player', function (Builder $query) use ($locations) {
             $query->whereIn('players.location_id', $locations->pluck('id'));
         })->with('player.location');
         Log::info('Players');
@@ -224,4 +228,75 @@ class UserController extends Controller
         ]);
 
     }
+
+    public function changeNickname(Request $request)
+    {
+        $user = $request->user();
+
+        $user->update([
+            'nickname' => $request->new_nickname
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'user' => $user,
+        ]);
+    }
+
+    public function changePassword(Request $request)
+    {
+        $user = $request->user();
+
+        $user->update([
+            'password' => Hash::make($request->new_password)
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'user' => $user,
+        ]);
+    }
+
+    public function updateProfileImage(Request $request)
+    {
+
+        try {
+            $user = User::find($request->user_id);
+
+            $newFile = $request->file('profile-image');
+            $img = Image::make($newFile->getRealPath());
+            $img->fit(300);
+            $ext = $newFile->getClientOriginalExtension();
+            $fileName = $user->nickname . rand(100000, 999999) . '.' . $ext;
+            $userDirectoryPath = $_SERVER['DOCUMENT_ROOT'] . '/storage/profilePictures/' . $user->id;
+            if (!file_exists($userDirectoryPath)) {
+                mkdir($userDirectoryPath, 0777, true);
+            } else {
+                $files = array_diff(scandir($userDirectoryPath), array('.','..'));
+                foreach ($files as $file) {
+                    unlink("$userDirectoryPath/$file");
+                }
+            }
+            $img->save($userDirectoryPath . '/' .$fileName, 60);
+
+            $path = 'https://' . $request->getHost() . '/storage/profilePictures/' . $user->id . '/';
+            $user->update([
+                'profile_image' => $path . $fileName
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'user' => $user,
+            ]);
+        } catch (\Exception $exception) {
+            Log::info('Line ======== ');
+            Log::info($exception->getLine());
+            Log::info('======= Line');
+            Log::info($exception->getMessage());
+            return response()->json([
+                'success' => false,
+            ]);
+        }
+    }
+
 }

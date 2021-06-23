@@ -129,9 +129,6 @@ class AuthController extends Controller
 
         $existEmail = User::where('email', $request->email)->exists();
 
-        Log::info('$existEmail');
-        Log::info(json_encode($existEmail));
-
         if ($existEmail) {
             return response()->json([
                 'success' => true,

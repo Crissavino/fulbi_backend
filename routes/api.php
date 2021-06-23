@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\ChatController;
 use App\Http\Controllers\Api\MatchController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\Api\UserController;
@@ -43,10 +44,19 @@ Route::get('/get-my-created-matches',[MatchController::class, 'getMyCreatedMatch
 Route::post('/send-invitation-to-user',[MatchController::class, 'sendInvitationToUser'])->middleware('auth:sanctum');
 //Match
 
+// Chat
+Route::post('/chat/send-message',[ChatController::class, 'sendMessage'])->middleware('auth:sanctum');
+Route::post('/chat/my-messages',[ChatController::class, 'myMessages'])->middleware('auth:sanctum');
+// Chat
+
 //User
 Route::post('/edit-user-positions',[UserController::class, 'editUserPositions'])->middleware('auth:sanctum');
 Route::post('/edit-user-location',[UserController::class, 'editUserLocation'])->middleware('auth:sanctum');
 Route::post('/get-users-offers',[UserController::class, 'getUserOffers'])->middleware('auth:sanctum');
 Route::post('/get-user-data',[UserController::class, 'getUserData'])->middleware('auth:sanctum');
+Route::post('/user/change-nickname',[UserController::class, 'changeNickname'])->middleware('auth:sanctum');
+Route::post('/user/change-password',[UserController::class, 'changePassword'])->middleware('auth:sanctum');
+Route::post('/user/update-profile-picture',[UserController::class, 'updateProfileImage']);
+//Route::post('/user/update-profile-picture',[UserController::class, 'updateProfileImage'])->middleware('authToken');
 //User
 

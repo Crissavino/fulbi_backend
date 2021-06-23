@@ -17,11 +17,11 @@ class CreateLocationsTable extends Migration
             $table->id();
             $table->float('lat');
             $table->float('lng');
-            $table->string('country');
-            $table->string('country_code');
-            $table->string('province');
-            $table->string('province_code');
-            $table->string('city');
+            $table->string('country')->nullable();
+            $table->string('country_code')->nullable();
+            $table->string('province')->nullable();
+            $table->string('province_code')->nullable();
+            $table->string('city')->nullable();
             $table->string('place_id');
             $table->string('formatted_address');
             $table->softDeletes();
