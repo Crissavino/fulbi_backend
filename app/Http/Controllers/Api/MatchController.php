@@ -7,6 +7,7 @@ use App\Models\Currency;
 use App\Models\Genre;
 use App\Models\Location;
 use App\Models\Match;
+use App\Models\Message;
 use App\Models\Type;
 use App\Models\User;
 use App\src\Infrastructure\Request\CreateOneMatchRequest;
@@ -430,6 +431,24 @@ class MatchController extends Controller
         }
         // relacionar y devolver partidos del jugador
         $match->players()->syncWithoutDetaching($user->player->id);
+        $match->players()->where('player_id', $user->player->id)->update([
+            'is_confirmed' => true
+        ]);
+
+        $message = Message::create([
+            'text' => __('chat_messages.header.joinMatch', [
+                'userName' => $user->name
+            ]),
+            'owner_id' => $user->id,
+            'chat_id' => $match->chat->id,
+            'type' => 4,
+        ]);
+        $message->players()->syncWithoutDetaching($match->players->pluck('id'));
+
+        $match->players()->where('player_id', '<>', $user->player->id)->update([
+            'have_notifications' => true
+        ]);
+
         $match->location;
         $match->cost = number_format($match->cost, 2);
         $match->participants = $match->players->map(function ($player) use ($match) {
@@ -478,7 +497,18 @@ class MatchController extends Controller
 
     public function getMyCreatedMatches(Request $request)
     {
-        $matches = $this->returnAllMatches($request);
+        $matches = Match::all();
+        $matches = $matches->where('owner_id', $request->user()->id);
+        $matches = $matches->sortBy(function ($match) use ($request) {
+            $match->location;
+            $match->have_notifications = $match->players()->where('player_id', $request->user()->player->id)
+                ->where('have_notifications', true)->exists();
+            $match->cost = number_format($match->cost, 2);
+            $match->participants = $match->players->map(function ($player) use ($match) {
+                return $player->user;
+            });
+            return $match->when_play;
+        });
 
         return response()->json([
             'success' => true,
@@ -489,15 +519,16 @@ class MatchController extends Controller
     public function sendInvitationToUser(Request $request) {
         $userWhoInvite = $request->user();
         $userToInvite = User::find($request->user_id);
-        $matchToInvite = Match::find($request->match_id);
+        $match = Match::find($request->match_id);
         // comprobar genero del partido si es compatible con el genero del jugador
-        if ($matchToInvite->genre_id !== $userToInvite->genre->id && $matchToInvite->genre_id !== self::MIX_GENRE_ID) {
+        if ($match->genre_id !== $userToInvite->genre->id && $match->genre_id !== self::MIX_GENRE_ID) {
             return response()->json([
                 'success' => false,
             ]);
         }
 
         // TODO enviar notificacion al $userToInvite de $userWhoInvite para unirse al partido
+        $match->players()->syncWithoutDetaching($userToInvite->player->id);
 
         return response()->json([
             'success' => true,
@@ -534,9 +565,10 @@ class MatchController extends Controller
     {
         $matches = Match::all();
         $matches = $matches->where('owner_id', $request->user()->id);
-        $matches = $matches->merge($request->user()->player->matches);
-        $matches = $matches->sortBy(function ($match) {
+        $matches = $matches->merge($request->user()->player->matches()->where('is_confirmed', true)->get());
+        $matches = $matches->sortBy(function ($match) use ($request) {
             $match->location;
+            $match->have_notifications = $match->players()->where('player_id', $request->user()->player->id)->where('have_notifications', true)->exists();
             $match->cost = number_format($match->cost, 2);
             $match->participants = $match->players->map(function ($player) use ($match) {
                 return $player->user;

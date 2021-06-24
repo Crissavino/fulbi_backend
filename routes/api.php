@@ -37,7 +37,7 @@ Route::post('/match/create',[MatchController::class, 'store'])->middleware('auth
 Route::post('/match/edit',[MatchController::class, 'edit'])->middleware('auth:sanctum');
 Route::post('/match/delete',[MatchController::class, 'deleteMatch'])->middleware('auth:sanctum');
 Route::post('/get-matches-offers',[MatchController::class, 'getMatchesOffers'])->middleware('auth:sanctum');
-Route::get('/get-my-matches',[MatchController::class, 'getMyMatches'])->middleware('auth:sanctum');
+Route::get('/matches/get-my-matches',[MatchController::class, 'getMyMatches'])->middleware('auth:sanctum');
 Route::post('/join-match',[MatchController::class, 'joinMatch'])->middleware('auth:sanctum');
 Route::post('/leave-match',[MatchController::class, 'leaveMatch'])->middleware('auth:sanctum');
 Route::get('/get-my-created-matches',[MatchController::class, 'getMyCreatedMatches'])->middleware('auth:sanctum');

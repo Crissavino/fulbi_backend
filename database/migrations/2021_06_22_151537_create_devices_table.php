@@ -31,16 +31,13 @@ class CreateDevicesTable extends Migration
             $table->timestamps();
         });
 
-        Schema::table('message_player', function (Blueprint $table) {
-            $table->boolean('read')->default(false);
-        });
-
         Schema::table('messages', function (Blueprint $table) {
             $table->integer('type')->default(1);
         });
 
-        Schema::table('matches', function (Blueprint $table) {
+        Schema::table('match_player', function (Blueprint $table) {
             $table->boolean('have_notifications')->default(false);
+            $table->boolean('is_confirmed')->default(false);
         });
     }
 
@@ -53,16 +50,14 @@ class CreateDevicesTable extends Migration
     {
         Schema::dropIfExists('devices');
         Schema::dropIfExists('device_message');
-        Schema::table('message_player', function (Blueprint $table) {
-            $table->dropColumn('read');
-        });
 
         Schema::table('messages', function (Blueprint $table) {
             $table->dropColumn('type');
         });
 
-        Schema::table('matches', function (Blueprint $table) {
+        Schema::table('match_player', function (Blueprint $table) {
             $table->dropColumn('have_notifications');
+            $table->dropColumn('is_confirmed');
         });
     }
 }
