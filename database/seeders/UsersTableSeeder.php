@@ -25,6 +25,7 @@ class UsersTableSeeder extends Seeder
                 'premium' => true,
                 'matches_created' => 0,
                 'genre_id' => 1,
+                'profile_image' => null,
                 'created_at' => now(),
                 'updated_at' => now()
             ],
@@ -38,6 +39,7 @@ class UsersTableSeeder extends Seeder
                 'premium' => true,
                 'matches_created' => 0,
                 'genre_id' => 1,
+                'profile_image' => null,
                 'created_at' => now(),
                 'updated_at' => now()
             ]
