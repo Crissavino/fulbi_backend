@@ -146,8 +146,6 @@ class UserController extends Controller
         $user->player->positions;
         $user->player->location;
 
-        Log::info('entra');
-
         return response()->json([
             'success' => true,
             'user' => $user,
@@ -160,8 +158,6 @@ class UserController extends Controller
 
         $users = User::whereHas('player.positions')->where('id', '!=', $user->id)
             ->where('genre_id', $request->genre_id)->with('player.positions');
-        Log::info('Players');
-        Log::info(json_encode($users->get()->values()));
         if ($users->count() === 0) {
             return response()->json([
                 'success' => true,
@@ -209,8 +205,6 @@ class UserController extends Controller
         $users = $users->whereHas('player', function (Builder $query) use ($locations) {
             $query->whereIn('players.location_id', $locations->pluck('id'));
         })->with('player.location');
-        Log::info('Players');
-        Log::info(json_encode($users->get()->values()));
         if ($users->count() === 0) {
             return response()->json([
                 'success' => true,
@@ -219,8 +213,6 @@ class UserController extends Controller
         }
 
         // TODO agregar coincidence para cada caso mas adelante
-        Log::info('Players');
-        Log::info(json_encode($users->get()->values()));
 
         return response()->json([
             'success' => true,

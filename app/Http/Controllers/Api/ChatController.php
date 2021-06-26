@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\Match;
 use App\Models\Message;
+use App\src\Infrastructure\Services\FcmPushNotificationsService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -28,6 +29,31 @@ class ChatController extends Controller
         $match->players()->where('player_id', '<>', $user->player->id)->update([
             'have_notifications' => true
         ]);
+
+        $whenPlay = Carbon::createFromFormat('Y-m-d H:i:s', $match->when_play);
+        $day = strlen((string)$whenPlay->day) === 1 ? '0'.$whenPlay->day : $whenPlay->day;
+        $month = strlen((string)$whenPlay->month) === 1 ? '0'.$whenPlay->month : $whenPlay->month;
+        $hour = strlen((string)$whenPlay->hour) === 1 ? '0'.$whenPlay->hour : $whenPlay->hour;
+        $minutes = strlen((string)$whenPlay->minute) === 1 ? '0'.$whenPlay->minute : $whenPlay->minute;
+        $otherPlayers = $match->players()->where('player_id', '<>', $user->player->id)->get();
+        $otherPlayers->map(function ($player) use ($message, $request, $match, $day, $month, $hour, $minutes){
+            $userDevicesTokens = $player->user->devices->pluck('token')->toArray();
+            if(!empty($userDevicesTokens)) {
+                FcmPushNotificationsService::sendChatTextMessage(
+                    __('notifications.match.chat.newMessage', [
+                        'userName' => $request->user()->name,
+                        'day' => $day . '/' . $month,
+                        'hour' => $hour . ':' . $minutes
+                    ]),
+                    $message->text,
+                    [
+                        'chat_id' => $request->chat_id,
+                        'match_id' => $match->id
+                    ],
+                    $userDevicesTokens
+                );
+            }
+        });
 
         return response()->json([
             'success' => true,

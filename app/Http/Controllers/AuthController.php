@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Device;
 use App\Models\Location;
 use App\Models\Position;
 use App\Models\User;
@@ -41,10 +42,19 @@ class AuthController extends Controller
 
         $token = $user->createToken('auth_token')->plainTextToken;
 
+        $fcmToken = $request->header('Fcm-Token');
+        $device = Device::updateOrCreate([
+            'token'   => $fcmToken
+        ],[
+            'user_id'     => $user->id,
+            'token' => $fcmToken,
+        ]);
+
         return response()->json([
             'success' => true,
             'user' => $user,
             'token' => $token,
+            'fcm_token' => $device->token,
             'token_type' => 'Bearer',
         ]);
     }
@@ -77,6 +87,15 @@ class AuthController extends Controller
 
         $token = $user->createToken('auth_token')->plainTextToken;
 
+        $fcmToken = $request->header('Fcm-Token');
+        $device = Device::updateOrCreate([
+            'token'   => $fcmToken
+        ],[
+            'user_id'     => $user->id,
+            'token' => $fcmToken,
+        ]);
+
+
         $user->player->positions;
         $user->player->location;
 
@@ -84,6 +103,7 @@ class AuthController extends Controller
             'success' => true,
             'token' => $token,
             'user' => $user,
+            'fcm_token' => $device->token,
             'token_type' => 'Bearer',
         ]);
     }
@@ -105,7 +125,6 @@ class AuthController extends Controller
         $user = $request->user();
 
         if (!$user) {
-            Log::info('Not user present');
             return response()->json([
                 'success' => true,
                 'message' => 'Successfully logged out'

@@ -32,7 +32,7 @@ class EloquentMatchService implements MatchService
 
     public function update($matchId, $when_play, $genre_id, $type_id, $num_players, $currency_id, $cost)
     {
-        return Match::find($matchId)->update([
+        Match::find($matchId)->update([
             'when_play' => $when_play,
             'genre_id' => $genre_id,
             'type_id' => $type_id,
@@ -40,5 +40,7 @@ class EloquentMatchService implements MatchService
             'currency_id' => $currency_id,
             'cost' => $cost,
         ]);
+
+        return Match::find($matchId);
     }
 }

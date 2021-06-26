@@ -8,6 +8,7 @@ use App\Models\Genre;
 use App\Models\Location;
 use App\Models\Match;
 use App\Models\Message;
+use App\Models\Player;
 use App\Models\Type;
 use App\Models\User;
 use App\src\Infrastructure\Request\CreateOneMatchRequest;
@@ -15,6 +16,7 @@ use App\src\Infrastructure\Services\EloquentChatService;
 use App\src\Infrastructure\Services\EloquentLocationService;
 use App\src\Infrastructure\Services\EloquentMatchService;
 use App\src\Infrastructure\Services\EloquentUserService;
+use App\src\Infrastructure\Services\FcmPushNotificationsService;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
@@ -80,6 +82,38 @@ class MatchController extends Controller
         );
 
         (new EloquentUserService())->addOneCreatedMatch($user);
+
+        $gr_circle_radius = 6371;
+        $max_distance = self::DEFAULT_MATCH_RANGE;
+        $matchLat = $locationData['lat'];
+        $matchLng = $locationData['lng'];
+        $distance_select = sprintf(
+            "( %d * acos( cos( radians(%s) ) " .
+            " * cos( radians( lat ) ) " .
+            " * cos( radians( lng ) - radians(%s) ) " .
+            " + sin( radians(%s) ) * sin( radians( lat ) ) " .
+            " ) " .
+            ")",
+            $gr_circle_radius,
+            $matchLat,
+            $matchLng,
+            $matchLat
+        );
+        $locations = Location::select('*')
+            ->having(DB::raw($distance_select), '<=', $max_distance)
+            ->get();
+
+        $players = Player::where('id', '<>', $user->player->id)->whereIn('location_id', $locations->pluck('id'))->with(['user'])->get();
+        $players->map(function ($player) use ($request, $user){
+            $userDevicesTokens = $player->user->devices->pluck('token')->toArray();
+            if(!empty($userDevicesTokens)) {
+                FcmPushNotificationsService::sendMatchCreated(
+                    __('notifications.match.created'),
+                    [],
+                    $userDevicesTokens
+                );
+            }
+        });
 
         return response()->json([
             'success' => true,
@@ -225,6 +259,29 @@ class MatchController extends Controller
             $currency_id,
             $cost,
         );
+
+        $whenPlay = Carbon::createFromFormat('Y-m-d H:i:s', $match->when_play);
+        $day = strlen((string)$whenPlay->day) === 1 ? '0'.$whenPlay->day : $whenPlay->day;
+        $month = strlen((string)$whenPlay->month) === 1 ? '0'.$whenPlay->month : $whenPlay->month;
+        $hour = strlen((string)$whenPlay->hour) === 1 ? '0'.$whenPlay->hour : $whenPlay->hour;
+        $minutes = strlen((string)$whenPlay->minute) === 1 ? '0'.$whenPlay->minute : $whenPlay->minute;
+        $otherPlayers = $match->players()->where('player_id', '<>', $user->player->id)->get();
+        $otherPlayers->map(function ($player) use ($request, $user, $match, $day, $month, $hour, $minutes){
+            $userDevicesTokens = $player->user->devices->pluck('token')->toArray();
+            if(!empty($userDevicesTokens)) {
+                FcmPushNotificationsService::sendMatchEdited(
+                    __('notifications.match.edited', [
+                        'userName' => $user->name,
+                        'day' => $day . '/' . $month,
+                        'hour' => $hour . ':' . $minutes
+                    ]),
+                    [
+                        'match_id' => $match->id,
+                    ],
+                    $userDevicesTokens
+                );
+            }
+        });
 
         return [
             'success' => true,
@@ -418,36 +475,135 @@ class MatchController extends Controller
         ]);
     }
 
-    public function joinMatch(Request $request) {
-
-        $user = $request->user();
+    public function sendInvitationToUser(Request $request) {
+        $userWhoInvite = $request->user();
+        $userToInvite = User::find($request->user_id);
         $match = Match::find($request->match_id);
         // comprobar genero del partido si es compatible con el genero del jugador
-        if ($match->genre_id !== $user->genre->id && $match->genre_id !== self::MIX_GENRE_ID) {
+        if ($match->genre_id !== $userToInvite->genre->id && $match->genre_id !== self::MIX_GENRE_ID) {
+            return response()->json([
+                'success' => false,
+            ]);
+        }
+
+        $whenPlay = Carbon::createFromFormat('Y-m-d H:i:s', $match->when_play);
+        $day = strlen((string)$whenPlay->day) === 1 ? '0'.$whenPlay->day : $whenPlay->day;
+        $month = strlen((string)$whenPlay->month) === 1 ? '0'.$whenPlay->month : $whenPlay->month;
+        $hour = strlen((string)$whenPlay->hour) === 1 ? '0'.$whenPlay->hour : $whenPlay->hour;
+        $minutes = strlen((string)$whenPlay->minute) === 1 ? '0'.$whenPlay->minute : $whenPlay->minute;
+        $userDevicesTokens = $userToInvite->devices->pluck('token')->toArray();
+
+        FcmPushNotificationsService::sendMatchInvitation(
+            __('notifications.match.invited', [
+                'userName' => $userWhoInvite->name,
+                'day' => $day . '/' . $month,
+                'hour' => $hour . ':' . $minutes
+            ]),
+            [
+                'match_id' => $match->id,
+            ],
+            $userDevicesTokens
+        );
+
+        $match->players()->syncWithoutDetaching($userToInvite->player->id);
+
+        return response()->json([
+            'success' => true,
+        ]);
+    }
+
+    public function rejectInvitationToMatch(Request $request) {
+
+        $user = $request->user();
+        $player = $user->player;
+        $match = Match::find($request->match_id);
+        $userWhoInvited = User::find($match->owner_id);
+        $isInTheMatch = $match->players()->where('player_id', $player->id)->exists();
+        if (!$isInTheMatch) {
+            return response()->json([
+                'success' => false,
+            ]);
+        }
+
+        $match->players()->wherePivot('match_id', $match->id)->wherePivot('player_id', $player->id)->detach();
+
+        $whenPlay = Carbon::createFromFormat('Y-m-d H:i:s', $match->when_play);
+        $day = strlen((string)$whenPlay->day) === 1 ? '0'.$whenPlay->day : $whenPlay->day;
+        $month = strlen((string)$whenPlay->month) === 1 ? '0'.$whenPlay->month : $whenPlay->month;
+        $hour = strlen((string)$whenPlay->hour) === 1 ? '0'.$whenPlay->hour : $whenPlay->hour;
+        $minutes = strlen((string)$whenPlay->minute) === 1 ? '0'.$whenPlay->minute : $whenPlay->minute;
+        $userDevicesTokens = $userWhoInvited->devices->pluck('token')->toArray();
+
+        FcmPushNotificationsService::sendRejectMatchInvitation(
+            __('notifications.match.reject', [
+                'userName' => $user->name,
+                'day' => $day . '/' . $month,
+                'hour' => $hour . ':' . $minutes
+            ]),
+            [
+                'match_id' => $match->id,
+            ],
+            $userDevicesTokens
+        );
+
+        $matches = $this->returnAllMatches($request);
+
+        return response()->json([
+            'success' => true,
+            'matches' => $matches->values(),
+        ]);
+    }
+
+    public function joinMatch(Request $request) {
+
+        $userWhoJoin = $request->user();
+        $match = Match::find($request->match_id);
+        $userWhoInvited = User::find($match->owner_id);
+        // comprobar genero del partido si es compatible con el genero del jugador
+        if ($match->genre_id !== $userWhoJoin->genre->id && $match->genre_id !== self::MIX_GENRE_ID) {
             return response()->json([
                 'success' => false,
                 'matches' => [],
             ]);
         }
         // relacionar y devolver partidos del jugador
-        $match->players()->syncWithoutDetaching($user->player->id);
-        $match->players()->where('player_id', $user->player->id)->update([
+        $match->players()->syncWithoutDetaching($userWhoJoin->player->id);
+        $match->players()->where('player_id', $userWhoJoin->player->id)->update([
             'is_confirmed' => true
         ]);
 
         $message = Message::create([
-            'text' => __('chat_messages.header.joinMatch', [
-                'userName' => $user->name
+            'text' => __('notifications.match.chat.join', [
+                'userName' => $userWhoJoin->name
             ]),
-            'owner_id' => $user->id,
+            'owner_id' => $userWhoJoin->id,
             'chat_id' => $match->chat->id,
             'type' => 4,
         ]);
         $message->players()->syncWithoutDetaching($match->players->pluck('id'));
 
-        $match->players()->where('player_id', '<>', $user->player->id)->update([
+        $match->players()->where('player_id', '<>', $userWhoJoin->player->id)->update([
             'have_notifications' => true
         ]);
+
+        $whenPlay = Carbon::createFromFormat('Y-m-d H:i:s', $match->when_play);
+        $day = strlen((string)$whenPlay->day) === 1 ? '0'.$whenPlay->day : $whenPlay->day;
+        $month = strlen((string)$whenPlay->month) === 1 ? '0'.$whenPlay->month : $whenPlay->month;
+        $hour = strlen((string)$whenPlay->hour) === 1 ? '0'.$whenPlay->hour : $whenPlay->hour;
+        $minutes = strlen((string)$whenPlay->minute) === 1 ? '0'.$whenPlay->minute : $whenPlay->minute;
+        $userDevicesTokens = $userWhoInvited->devices->pluck('token')->toArray();
+
+        FcmPushNotificationsService::sendJoinedToMatch(
+            __('notifications.match.join', [
+                'userName' => $userWhoJoin->name,
+                'day' => $day . '/' . $month,
+                'hour' => $hour . ':' . $minutes
+            ]),
+            [
+                'match_id' => $match->id,
+            ],
+            $userDevicesTokens
+        );
 
         $match->location;
         $match->cost = number_format($match->cost, 2);
@@ -466,8 +622,10 @@ class MatchController extends Controller
 
     public function leaveMatch(Request $request) {
 
-        $player = $request->user()->player;
+        $userWhoJoin = $request->user();
+        $player = $userWhoJoin->player;
         $match = Match::find($request->match_id);
+        $userWhoInvited = User::find($match->owner_id);
         $isInTheMatch = $match->players()->where('player_id', $player->id)->exists();
         if (!$isInTheMatch) {
             return response()->json([
@@ -476,6 +634,34 @@ class MatchController extends Controller
         }
 
         $match->players()->wherePivot('match_id', $match->id)->wherePivot('player_id', $player->id)->detach();
+
+        Message::create([
+            'text' => __('notifications.match.chat.left', [
+                'userName' => $userWhoJoin->name
+            ]),
+            'owner_id' => $userWhoJoin->id,
+            'chat_id' => $match->chat->id,
+            'type' => 4,
+        ]);
+
+        $whenPlay = Carbon::createFromFormat('Y-m-d H:i:s', $match->when_play);
+        $day = strlen((string)$whenPlay->day) === 1 ? '0'.$whenPlay->day : $whenPlay->day;
+        $month = strlen((string)$whenPlay->month) === 1 ? '0'.$whenPlay->month : $whenPlay->month;
+        $hour = strlen((string)$whenPlay->hour) === 1 ? '0'.$whenPlay->hour : $whenPlay->hour;
+        $minutes = strlen((string)$whenPlay->minute) === 1 ? '0'.$whenPlay->minute : $whenPlay->minute;
+        $userDevicesTokens = $userWhoInvited->devices->pluck('token')->toArray();
+
+        FcmPushNotificationsService::sendLeftMatch(
+            __('notifications.match.left', [
+                'userName' => $userWhoJoin->name,
+                'day' => $day . '/' . $month,
+                'hour' => $hour . ':' . $minutes
+            ]),
+            [
+                'match_id' => $match->id,
+            ],
+            $userDevicesTokens
+        );
 
         $matches = $this->returnAllMatches($request);
 
@@ -516,25 +702,6 @@ class MatchController extends Controller
         ]);
     }
 
-    public function sendInvitationToUser(Request $request) {
-        $userWhoInvite = $request->user();
-        $userToInvite = User::find($request->user_id);
-        $match = Match::find($request->match_id);
-        // comprobar genero del partido si es compatible con el genero del jugador
-        if ($match->genre_id !== $userToInvite->genre->id && $match->genre_id !== self::MIX_GENRE_ID) {
-            return response()->json([
-                'success' => false,
-            ]);
-        }
-
-        // TODO enviar notificacion al $userToInvite de $userWhoInvite para unirse al partido
-        $match->players()->syncWithoutDetaching($userToInvite->player->id);
-
-        return response()->json([
-            'success' => true,
-        ]);
-    }
-
     public function deleteMatch(Request $request) {
 
         $user = $request->user();
@@ -565,16 +732,18 @@ class MatchController extends Controller
     {
         $matches = Match::all();
         $matches = $matches->where('owner_id', $request->user()->id);
-        $matches = $matches->merge($request->user()->player->matches()->where('is_confirmed', true)->get());
+        $matches = $matches->merge($request->user()->player->matches);
         $matches = $matches->sortBy(function ($match) use ($request) {
             $match->location;
             $match->have_notifications = $match->players()->where('player_id', $request->user()->player->id)->where('have_notifications', true)->exists();
+            $match->is_confirmed = $match->players()->where('player_id', $request->user()->player->id)->where('is_confirmed', true)->exists();
             $match->cost = number_format($match->cost, 2);
             $match->participants = $match->players->map(function ($player) use ($match) {
                 return $player->user;
             });
             return $match->when_play;
         });
+
         return $matches;
     }
 

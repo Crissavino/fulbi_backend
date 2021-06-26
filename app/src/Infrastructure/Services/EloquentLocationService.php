@@ -28,7 +28,7 @@ class EloquentLocationService implements LocationService
 
     public function update($locationId, $lat, $lng, $country, $country_code, $province, $province_code, $city, $place_id, $formatted_address, $is_by_lat_lng)
     {
-        return Location::find($locationId)->update([
+        Location::find($locationId)->update([
             'lat' => $lat,
             'lng' => $lng,
             'country'=> $country,
@@ -40,5 +40,7 @@ class EloquentLocationService implements LocationService
             'formatted_address'=> $formatted_address,
             'is_by_lat_lng'=> $is_by_lat_lng,
         ]);
+
+        return Location::find($locationId);
     }
 }

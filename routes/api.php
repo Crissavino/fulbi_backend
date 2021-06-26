@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Api\ChatController;
 use App\Http\Controllers\Api\MatchController;
+use App\Http\Controllers\Api\NotificationsController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\Api\UserController;
 use Illuminate\Http\Request;
@@ -36,12 +37,13 @@ Route::get('/match/{id}',[MatchController::class, 'getMatch'])->middleware('auth
 Route::post('/match/create',[MatchController::class, 'store'])->middleware('auth:sanctum');
 Route::post('/match/edit',[MatchController::class, 'edit'])->middleware('auth:sanctum');
 Route::post('/match/delete',[MatchController::class, 'deleteMatch'])->middleware('auth:sanctum');
-Route::post('/get-matches-offers',[MatchController::class, 'getMatchesOffers'])->middleware('auth:sanctum');
+Route::post('/matches/get-matches-offers',[MatchController::class, 'getMatchesOffers'])->middleware('auth:sanctum');
 Route::get('/matches/get-my-matches',[MatchController::class, 'getMyMatches'])->middleware('auth:sanctum');
 Route::post('/join-match',[MatchController::class, 'joinMatch'])->middleware('auth:sanctum');
 Route::post('/leave-match',[MatchController::class, 'leaveMatch'])->middleware('auth:sanctum');
+Route::post('/matches/reject-invitation',[MatchController::class, 'rejectInvitationToMatch'])->middleware('auth:sanctum');
 Route::get('/get-my-created-matches',[MatchController::class, 'getMyCreatedMatches'])->middleware('auth:sanctum');
-Route::post('/send-invitation-to-user',[MatchController::class, 'sendInvitationToUser'])->middleware('auth:sanctum');
+Route::post('/matches/send-invitation-to-user',[MatchController::class, 'sendInvitationToUser'])->middleware('auth:sanctum');
 //Match
 
 // Chat
@@ -59,4 +61,8 @@ Route::post('/user/change-password',[UserController::class, 'changePassword'])->
 Route::post('/user/update-profile-picture',[UserController::class, 'updateProfileImage']);
 //Route::post('/user/update-profile-picture',[UserController::class, 'updateProfileImage'])->middleware('authToken');
 //User
+
+//Notifications
+Route::post('/notifications/send',[NotificationsController::class, 'sendNotification']);
+//Notifications
 
