@@ -18,7 +18,7 @@ class AuthController extends Controller
         $validatedData = $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
-            'password' => 'required|string|min:6',
+            'password' => 'required|string|min:6'
         ]);
 
         $nickname = $this->createNickName($validatedData['name']);
@@ -29,7 +29,7 @@ class AuthController extends Controller
             'is_fully_set' => false,
             'premium' => false,
             'matches_created' => 0,
-            'password' => Hash::make($validatedData['password']),
+            'password' => Hash::make($validatedData['password'])
         ]);
 
         $player = $user->player()->create([
@@ -47,7 +47,7 @@ class AuthController extends Controller
             'token'   => $fcmToken
         ],[
             'user_id'     => $user->id,
-            'token' => $fcmToken,
+            'token' => $fcmToken
         ]);
 
         return response()->json([
@@ -55,7 +55,7 @@ class AuthController extends Controller
             'user' => $user,
             'token' => $token,
             'fcm_token' => $device->token,
-            'token_type' => 'Bearer',
+            'token_type' => 'Bearer'
         ]);
     }
 
@@ -92,7 +92,7 @@ class AuthController extends Controller
             'token'   => $fcmToken
         ],[
             'user_id'     => $user->id,
-            'token' => $fcmToken,
+            'token' => $fcmToken
         ]);
 
 
@@ -104,7 +104,7 @@ class AuthController extends Controller
             'token' => $token,
             'user' => $user,
             'fcm_token' => $device->token,
-            'token_type' => 'Bearer',
+            'token_type' => 'Bearer'
         ]);
     }
 
@@ -115,7 +115,7 @@ class AuthController extends Controller
         $request->user()->player->location;
         return response()->json([
             'success' => true,
-            'user' => $request->user(),
+            'user' => $request->user()
         ]);
     }
 
@@ -135,6 +135,8 @@ class AuthController extends Controller
         $headerToken = explode(' ', $request->header('authorization'))[1];
         $token = $user->tokens()->where('token', $headerToken)->first();
         $token->delete();
+
+        // TODO borrar token del device
 
         return response()->json([
             'success' => true,
@@ -156,7 +158,7 @@ class AuthController extends Controller
         }
 
         return response()->json([
-            'success' => false,
+            'success' => false
         ]);
     }
 
@@ -166,7 +168,7 @@ class AuthController extends Controller
         if (!$validation['success']) {
             return response()->json([
                 'success' => $validation['success'],
-                'message' => $validation['message'],
+                'message' => $validation['message']
             ]);
         }
         // $userPositions = $validation['userPositions'];
@@ -221,7 +223,7 @@ class AuthController extends Controller
         return response()->json([
             'success' => true,
             'user' => $user,
-            'message' => 'User fully setted',
+            'message' => 'User fully setted'
         ]);
 
     }
@@ -237,13 +239,13 @@ class AuthController extends Controller
         if (!$userLocationDetails['country'] || !$userLocationDetails['place_id'] || !$userLocationDetails['formatted_address'] || !$userLocationDetails['country_code'] || !$userLocationDetails['province'] || !$userLocationDetails['province_code'] || !$userLocationDetails['city']) {
             return [
                 'success' => false,
-                'message' => 'Error during save of user locations',
+                'message' => 'Error during save of user locations'
             ];
         }
 
         return [
             'success' => true,
-            'userLocationDetails' => $userLocationDetails,
+            'userLocationDetails' => $userLocationDetails
         ];
     }
 
@@ -265,7 +267,7 @@ class AuthController extends Controller
                     'province_code' => $userLocationDetails['province_code'],
                     'city' => $userLocationDetails['city'],
                     'place_id' => $userLocationDetails['place_id'],
-                    'formatted_address' => $userLocationDetails['formatted_address'],
+                    'formatted_address' => $userLocationDetails['formatted_address']
                 ]);
             } else {
                 $location = Location::create([
@@ -277,7 +279,7 @@ class AuthController extends Controller
                     'province_code' => $userLocationDetails['province_code'],
                     'city' => $userLocationDetails['city'],
                     'place_id' => $userLocationDetails['place_id'],
-                    'formatted_address' => $userLocationDetails['formatted_address'],
+                    'formatted_address' => $userLocationDetails['formatted_address']
                 ]);
             }
 

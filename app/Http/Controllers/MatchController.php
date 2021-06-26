@@ -44,7 +44,7 @@ class MatchController extends Controller
             'apiKey' => $apiKey,
             'types' => $types,
             'genres' => $genres,
-            'currencies' => $currencies,
+            'currencies' => $currencies
         ]);
     }
 
@@ -111,7 +111,7 @@ class MatchController extends Controller
         if (!$requestResponse['success']) {
             return response()->json([
                 'success' => false,
-                'message' => __($requestResponse['message']),
+                'message' => __($requestResponse['message'])
             ]);
         }
 
@@ -131,7 +131,7 @@ class MatchController extends Controller
             (new EloquentLocationService()),
             (new EloquentChatService()),
             (new EloquentMatchService()),
-            (new EloquentUserService()),
+            (new EloquentUserService())
         ))->handle($command);
         if (!$handleResponse['success']) {
             return redirect()->route('matches.add')->withErrors([
@@ -163,7 +163,7 @@ class MatchController extends Controller
         return view('matches.chat', [
             'match' => $match,
             'chat' => $chat,
-            'messages' => $messages,
+            'messages' => $messages
         ]);
     }
 
@@ -174,7 +174,7 @@ class MatchController extends Controller
 
         return view('matches.enrolled', [
             'match' => $match,
-            'players' => $players,
+            'players' => $players
         ]);
     }
 }

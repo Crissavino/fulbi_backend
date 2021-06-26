@@ -50,7 +50,7 @@ class MatchController extends Controller
             return [
                 'success' => false,
                 'max_free_matches_reached' => true,
-                'message' => __('errors.maxMatchesReached'),
+                'message' => __('errors.maxMatchesReached')
             ];
         }
 
@@ -118,7 +118,7 @@ class MatchController extends Controller
         return response()->json([
             'success' => true,
             'chat' => $chat,
-            'match' => $match,
+            'match' => $match
         ]);
     }
 
@@ -191,7 +191,7 @@ class MatchController extends Controller
             'cost' => $cost,
             'num_players' => $numPlayers,
             'locationData' => $locationData,
-            'user' => $request->user(),
+            'user' => $request->user()
         ];
     }
 
@@ -208,7 +208,7 @@ class MatchController extends Controller
             'location' => Location::find($match->location_id),
             'genre' => Genre::find($match->genre_id),
             'type' => Type::find($match->type_id),
-            'currency' => Currency::find($match->currency_id),
+            'currency' => Currency::find($match->currency_id)
         ]);
     }
 
@@ -232,7 +232,7 @@ class MatchController extends Controller
         $match = $parameters['match'];
         if ($match->owner_id !== $user->id) {
             return [
-                'success' => false,
+                'success' => false
             ];
         }
 
@@ -257,7 +257,7 @@ class MatchController extends Controller
             $type_id,
             $num_players,
             $currency_id,
-            $cost,
+            $cost
         );
 
         $whenPlay = Carbon::createFromFormat('Y-m-d H:i:s', $match->when_play);
@@ -276,7 +276,7 @@ class MatchController extends Controller
                         'hour' => $hour . ':' . $minutes
                     ]),
                     [
-                        'match_id' => $match->id,
+                        'match_id' => $match->id
                     ],
                     $userDevicesTokens
                 );
@@ -285,7 +285,7 @@ class MatchController extends Controller
 
         return [
             'success' => true,
-            'match' => $match,
+            'match' => $match
         ];
     }
 
@@ -405,7 +405,7 @@ class MatchController extends Controller
 
         return response()->json([
             'success' => true,
-            'matches' => $matches,
+            'matches' => $matches
         ]);
 
     }
@@ -438,7 +438,7 @@ class MatchController extends Controller
         if ($matches->count() === 0) {
             return response([
                 'success' => true,
-                'matches' => [],
+                'matches' => []
             ]);
         }
 
@@ -447,7 +447,7 @@ class MatchController extends Controller
         if ($matches->count() === 0) {
             return response()->json([
                 'success' => true,
-                'matches' => [],
+                'matches' => []
             ]);
         }
 
@@ -456,7 +456,7 @@ class MatchController extends Controller
         if ($matches->count() === 0) {
             return response()->json([
                 'success' => true,
-                'matches' => [],
+                'matches' => []
             ]);
         }
 
@@ -471,7 +471,7 @@ class MatchController extends Controller
 
         return response()->json([
             'success' => true,
-            'matches' => $matches->values(),
+            'matches' => $matches->values()
         ]);
     }
 
@@ -482,7 +482,7 @@ class MatchController extends Controller
         // comprobar genero del partido si es compatible con el genero del jugador
         if ($match->genre_id !== $userToInvite->genre->id && $match->genre_id !== self::MIX_GENRE_ID) {
             return response()->json([
-                'success' => false,
+                'success' => false
             ]);
         }
 
@@ -500,7 +500,7 @@ class MatchController extends Controller
                 'hour' => $hour . ':' . $minutes
             ]),
             [
-                'match_id' => $match->id,
+                'match_id' => $match->id
             ],
             $userDevicesTokens
         );
@@ -508,7 +508,7 @@ class MatchController extends Controller
         $match->players()->syncWithoutDetaching($userToInvite->player->id);
 
         return response()->json([
-            'success' => true,
+            'success' => true
         ]);
     }
 
@@ -521,7 +521,7 @@ class MatchController extends Controller
         $isInTheMatch = $match->players()->where('player_id', $player->id)->exists();
         if (!$isInTheMatch) {
             return response()->json([
-                'success' => false,
+                'success' => false
             ]);
         }
 
@@ -541,7 +541,7 @@ class MatchController extends Controller
                 'hour' => $hour . ':' . $minutes
             ]),
             [
-                'match_id' => $match->id,
+                'match_id' => $match->id
             ],
             $userDevicesTokens
         );
@@ -550,7 +550,7 @@ class MatchController extends Controller
 
         return response()->json([
             'success' => true,
-            'matches' => $matches->values(),
+            'matches' => $matches->values()
         ]);
     }
 
@@ -563,7 +563,7 @@ class MatchController extends Controller
         if ($match->genre_id !== $userWhoJoin->genre->id && $match->genre_id !== self::MIX_GENRE_ID) {
             return response()->json([
                 'success' => false,
-                'matches' => [],
+                'matches' => []
             ]);
         }
         // relacionar y devolver partidos del jugador
@@ -578,7 +578,7 @@ class MatchController extends Controller
             ]),
             'owner_id' => $userWhoJoin->id,
             'chat_id' => $match->chat->id,
-            'type' => 4,
+            'type' => 4
         ]);
         $message->players()->syncWithoutDetaching($match->players->pluck('id'));
 
@@ -600,7 +600,7 @@ class MatchController extends Controller
                 'hour' => $hour . ':' . $minutes
             ]),
             [
-                'match_id' => $match->id,
+                'match_id' => $match->id
             ],
             $userDevicesTokens
         );
@@ -616,7 +616,7 @@ class MatchController extends Controller
         return response()->json([
             'success' => true,
             'matches' => $matches->values(),
-            'match' => $match,
+            'match' => $match
         ]);
     }
 
@@ -629,7 +629,7 @@ class MatchController extends Controller
         $isInTheMatch = $match->players()->where('player_id', $player->id)->exists();
         if (!$isInTheMatch) {
             return response()->json([
-                'success' => false,
+                'success' => false
             ]);
         }
 
@@ -641,7 +641,7 @@ class MatchController extends Controller
             ]),
             'owner_id' => $userWhoJoin->id,
             'chat_id' => $match->chat->id,
-            'type' => 4,
+            'type' => 4
         ]);
 
         $whenPlay = Carbon::createFromFormat('Y-m-d H:i:s', $match->when_play);
@@ -658,7 +658,7 @@ class MatchController extends Controller
                 'hour' => $hour . ':' . $minutes
             ]),
             [
-                'match_id' => $match->id,
+                'match_id' => $match->id
             ],
             $userDevicesTokens
         );
@@ -667,7 +667,7 @@ class MatchController extends Controller
 
         return response()->json([
             'success' => true,
-            'matches' => $matches->values(),
+            'matches' => $matches->values()
         ]);
     }
 
@@ -677,7 +677,7 @@ class MatchController extends Controller
 
         return response()->json([
             'success' => true,
-            'matches' => $matches->values(),
+            'matches' => $matches->values()
         ]);
     }
 
@@ -698,7 +698,7 @@ class MatchController extends Controller
 
         return response()->json([
             'success' => true,
-            'matches' => $matches->values(),
+            'matches' => $matches->values()
         ]);
     }
 
@@ -709,7 +709,7 @@ class MatchController extends Controller
         $isInTheOwner = $match->owner_id === $user->id;
         if (!$isInTheOwner) {
             return response()->json([
-                'success' => false,
+                'success' => false
             ]);
         }
         $match->players()->wherePivot('match_id', $match->id)->detach();
@@ -720,7 +720,7 @@ class MatchController extends Controller
 
         return response()->json([
             'success' => true,
-            'matches' => $matches->values(),
+            'matches' => $matches->values()
         ]);
     }
 

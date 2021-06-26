@@ -43,7 +43,7 @@ class UserController extends Controller
 
         return response()->json([
             'success' => true,
-            'user' => $user,
+            'user' => $user
         ]);
     }
 
@@ -54,7 +54,7 @@ class UserController extends Controller
         if (!$daysAvailables[0] && !$daysAvailables[1] && !$daysAvailables[2] && !$daysAvailables[3] && !$daysAvailables[4] && !$daysAvailables[5] && !$daysAvailables[6]) {
             return response()->json([
                 'success' => false,
-                'message' => 'Error during save of user days available',
+                'message' => 'Error during save of user days available'
             ]);
         }
 
@@ -72,7 +72,7 @@ class UserController extends Controller
         return response()->json([
             'success' => true,
             'user' => $user,
-            'message' => 'User days available saved',
+            'message' => 'User days available saved'
         ]);
     }
 
@@ -83,7 +83,7 @@ class UserController extends Controller
 
         return response()->json([
             'success' => true,
-            'user' => $user,
+            'user' => $user
         ]);
     }
 

@@ -29,7 +29,7 @@ class UserController extends Controller
         return response()->json([
             'success' => true,
             'user' => $user,
-            'message' => 'User positions saved',
+            'message' => 'User positions saved'
         ]);
     }
 
@@ -50,7 +50,7 @@ class UserController extends Controller
             }
 
             return [
-                'success' => true,
+                'success' => true
             ];
         } catch (\Exception $exception) {
             Log::info('Error during save of user positions', [$exception->getMessage()]);
@@ -69,7 +69,7 @@ class UserController extends Controller
         if (!$userLocationDetails['country'] || !$userLocationDetails['place_id'] || !$userLocationDetails['formatted_address'] || !$userLocationDetails['country_code'] || !$userLocationDetails['province'] || !$userLocationDetails['province_code'] || !$userLocationDetails['city']) {
             return [
                 'success' => false,
-                'message' => 'Error during save of user locations',
+                'message' => 'Error during save of user locations'
             ];
         }
         $saveUserLocationResponse = $this->saveUserLocation($user, $userLocationDetails);
@@ -85,7 +85,7 @@ class UserController extends Controller
         return response()->json([
             'success' => true,
             'user' => $user,
-            'message' => 'User location saved',
+            'message' => 'User location saved'
         ]);
     }
 
@@ -107,7 +107,7 @@ class UserController extends Controller
                     'province_code' => $userLocationDetails['province_code'],
                     'city' => $userLocationDetails['city'],
                     'place_id' => $userLocationDetails['place_id'],
-                    'formatted_address' => $userLocationDetails['formatted_address'],
+                    'formatted_address' => $userLocationDetails['formatted_address']
                 ]);
             } else {
                 $location = Location::create([
@@ -119,7 +119,7 @@ class UserController extends Controller
                     'province_code' => $userLocationDetails['province_code'],
                     'city' => $userLocationDetails['city'],
                     'place_id' => $userLocationDetails['place_id'],
-                    'formatted_address' => $userLocationDetails['formatted_address'],
+                    'formatted_address' => $userLocationDetails['formatted_address']
                 ]);
             }
 
@@ -128,7 +128,7 @@ class UserController extends Controller
             ]);
 
             return [
-                'success' => true,
+                'success' => true
             ];
         } catch (\Exception $exception) {
             Log::info('Error during save of user location', [$exception->getMessage()]);
@@ -148,7 +148,7 @@ class UserController extends Controller
 
         return response()->json([
             'success' => true,
-            'user' => $user,
+            'user' => $user
         ]);
     }
 
@@ -161,7 +161,7 @@ class UserController extends Controller
         if ($users->count() === 0) {
             return response()->json([
                 'success' => true,
-                'users' => [],
+                'users' => []
             ]);
         }
 
@@ -172,12 +172,11 @@ class UserController extends Controller
                     $query2->whereIn('positions.id', $positionsIds);
                 });
             });
-        Log::info('Players');
-        Log::info(json_encode($users->get()->values()));
+
         if ($users->count() === 0) {
             return response()->json([
                 'success' => true,
-                'users' => [],
+                'users' => []
             ]);
         }
 
@@ -208,7 +207,7 @@ class UserController extends Controller
         if ($users->count() === 0) {
             return response()->json([
                 'success' => true,
-                'users' => [],
+                'users' => []
             ]);
         }
 
@@ -216,7 +215,7 @@ class UserController extends Controller
 
         return response()->json([
             'success' => true,
-            'users' => $users->get()->values(),
+            'users' => $users->get()->values()
         ]);
 
     }
@@ -231,7 +230,7 @@ class UserController extends Controller
 
         return response()->json([
             'success' => true,
-            'user' => $user,
+            'user' => $user
         ]);
     }
 
@@ -245,7 +244,7 @@ class UserController extends Controller
 
         return response()->json([
             'success' => true,
-            'user' => $user,
+            'user' => $user
         ]);
     }
 
@@ -278,7 +277,7 @@ class UserController extends Controller
 
             return response()->json([
                 'success' => true,
-                'user' => $user,
+                'user' => $user
             ]);
         } catch (\Exception $exception) {
             Log::info('Line ======== ');
@@ -286,7 +285,7 @@ class UserController extends Controller
             Log::info('======= Line');
             Log::info($exception->getMessage());
             return response()->json([
-                'success' => false,
+                'success' => false
             ]);
         }
     }

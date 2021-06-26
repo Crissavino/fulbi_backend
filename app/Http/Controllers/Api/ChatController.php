@@ -21,7 +21,7 @@ class ChatController extends Controller
         $message = Message::create([
             'text' => $request->text,
             'owner_id' => $request->owner_id,
-            'chat_id' => $request->chat_id,
+            'chat_id' => $request->chat_id
         ]);
 
         $message->players()->syncWithoutDetaching($match->players->pluck('id'));
@@ -59,7 +59,7 @@ class ChatController extends Controller
             'success' => true,
             'message' => $message,
             'match' => $match,
-            'messages' => $match->chat->messages,
+            'messages' => $match->chat->messages
         ]);
 
     }
@@ -89,7 +89,7 @@ class ChatController extends Controller
 
         return response()->json([
             'success' => true,
-            'messages' => $messages->values(),
+            'messages' => $messages->values()
         ]);
 
     }
