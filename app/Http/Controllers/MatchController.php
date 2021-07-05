@@ -69,14 +69,14 @@ class MatchController extends Controller
             $requestResponse['cost'],
             $requestResponse['num_players'],
             $requestResponse['locationData'],
-            $requestResponse['userId'],
+            $requestResponse['userId']
         ));
 
         $handleResponse = (new OneCustomerCanCreateOneMatchCommandHandler(
             (new EloquentLocationService()),
             (new EloquentChatService()),
             (new EloquentMatchService()),
-            (new EloquentUserService()),
+            (new EloquentUserService())
         ))->handle($command);
         if (!$handleResponse['success']) {
             return redirect()->route('matches.add')->withErrors([
