@@ -208,7 +208,8 @@ class MatchController extends Controller
             'location' => Location::find($match->location_id),
             'genre' => Genre::find($match->genre_id),
             'type' => Type::find($match->type_id),
-            'currency' => Currency::find($match->currency_id)
+            'currency' => Currency::find($match->currency_id),
+            'players_enrolled' => $match->players()->with(['user'])->where('is_existing_player', 0)->get()->pluck('user')->count()
         ]);
     }
 
@@ -506,6 +507,83 @@ class MatchController extends Controller
         );
 
         $match->players()->syncWithoutDetaching($userToInvite->player->id);
+
+        return response()->json([
+            'success' => true
+        ]);
+    }
+
+    public function joinMatchFromInvitationLinkNewUser(Request $request) {
+        $userWhoInvite = User::find($request->owner_id);
+        $userToInvite = User::find($request->user_id);
+        $match = Match::find($request->match_id);
+        // comprobar genero del partido si es compatible con el genero del jugador
+        if ($match->genre_id !== $userToInvite->genre->id && $match->genre_id !== self::MIX_GENRE_ID) {
+            return response()->json([
+                'success' => false
+            ]);
+        }
+
+        $whenPlay = Carbon::createFromFormat('Y-m-d H:i:s', $match->when_play);
+        $day = strlen((string)$whenPlay->day) === 1 ? '0'.$whenPlay->day : $whenPlay->day;
+        $month = strlen((string)$whenPlay->month) === 1 ? '0'.$whenPlay->month : $whenPlay->month;
+        $hour = strlen((string)$whenPlay->hour) === 1 ? '0'.$whenPlay->hour : $whenPlay->hour;
+        $minutes = strlen((string)$whenPlay->minute) === 1 ? '0'.$whenPlay->minute : $whenPlay->minute;
+        $userDevicesTokens = $userToInvite->devices->pluck('token')->toArray();
+
+        FcmPushNotificationsService::sendMatchInvitation(
+            __('notifications.match.invited', [
+                'userName' => $userWhoInvite->name,
+                'day' => $day . '/' . $month,
+                'hour' => $hour . ':' . $minutes
+            ]),
+            [
+                'match_id' => $match->id
+            ],
+            $userDevicesTokens
+        );
+
+        $match->players()->syncWithoutDetaching($userToInvite->player->id);
+
+        return response()->json([
+            'success' => true
+        ]);
+    }
+
+    public function joinMatchFromInvitationLinkExistingUser(Request $request) {
+        $userWhoInvite = User::find($request->owner_id);
+        $userToInvite = User::find($request->user_id);
+        $match = Match::find($request->match_id);
+        // comprobar genero del partido si es compatible con el genero del jugador
+        if ($match->genre_id !== $userToInvite->genre->id && $match->genre_id !== self::MIX_GENRE_ID) {
+            return response()->json([
+                'success' => false
+            ]);
+        }
+
+        $whenPlay = Carbon::createFromFormat('Y-m-d H:i:s', $match->when_play);
+        $day = strlen((string)$whenPlay->day) === 1 ? '0'.$whenPlay->day : $whenPlay->day;
+        $month = strlen((string)$whenPlay->month) === 1 ? '0'.$whenPlay->month : $whenPlay->month;
+        $hour = strlen((string)$whenPlay->hour) === 1 ? '0'.$whenPlay->hour : $whenPlay->hour;
+        $minutes = strlen((string)$whenPlay->minute) === 1 ? '0'.$whenPlay->minute : $whenPlay->minute;
+        $userDevicesTokens = $userToInvite->devices->pluck('token')->toArray();
+
+        FcmPushNotificationsService::sendMatchInvitation(
+            __('notifications.match.invited', [
+                'userName' => $userWhoInvite->name,
+                'day' => $day . '/' . $month,
+                'hour' => $hour . ':' . $minutes
+            ]),
+            [
+                'match_id' => $match->id
+            ],
+            $userDevicesTokens
+        );
+
+        $match->players()->syncWithoutDetaching($userToInvite->player->id);
+        $match->players()->where('player_id', $userToInvite->player->id)->update([
+            'is_existing_player' => true
+        ]);
 
         return response()->json([
             'success' => true

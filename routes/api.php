@@ -44,6 +44,8 @@ Route::post('/leave-match',[MatchController::class, 'leaveMatch'])->middleware('
 Route::post('/matches/reject-invitation',[MatchController::class, 'rejectInvitationToMatch'])->middleware('auth:sanctum');
 Route::get('/get-my-created-matches',[MatchController::class, 'getMyCreatedMatches'])->middleware('auth:sanctum');
 Route::post('/matches/send-invitation-to-user',[MatchController::class, 'sendInvitationToUser'])->middleware('auth:sanctum');
+Route::post('/matches/join-match-from-invitation-link-new-user',[MatchController::class, 'joinMatchFromInvitationLinkNewUser'])->middleware('auth:sanctum');
+Route::post('/matches/join-match-from-invitation-link-existing-user',[MatchController::class, 'joinMatchFromInvitationLinkExistingUser'])->middleware('auth:sanctum');
 //Match
 
 // Chat
@@ -59,7 +61,7 @@ Route::post('/get-user-data',[UserController::class, 'getUserData'])->middleware
 Route::post('/user/change-nickname',[UserController::class, 'changeNickname'])->middleware('auth:sanctum');
 Route::post('/user/change-password',[UserController::class, 'changePassword'])->middleware('auth:sanctum');
 Route::post('/user/update-profile-picture',[UserController::class, 'updateProfileImage']);
-//Route::post('/user/update-profile-picture',[UserController::class, 'updateProfileImage'])->middleware('authToken');
+Route::post('/user/send-recovery-password-email',[AuthController::class, 'sendRecoveryPasswordEmail']);
 //User
 
 //Notifications

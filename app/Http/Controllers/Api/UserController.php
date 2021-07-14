@@ -224,14 +224,21 @@ class UserController extends Controller
     {
         $user = $request->user();
 
-        $user->update([
-            'nickname' => $request->new_nickname
-        ]);
+        if (!User::whereNickname($request->new_nickname)->exists()) {
+            $user->update([
+                'nickname' => $request->new_nickname
+            ]);
 
-        return response()->json([
-            'success' => true,
-            'user' => $user
-        ]);
+            return response()->json([
+                'success' => true,
+                'user' => $user
+            ]);
+        } else {
+            return response()->json([
+                'success' => false,
+            ]);
+        }
+
     }
 
     public function changePassword(Request $request)

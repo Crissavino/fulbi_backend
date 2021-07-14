@@ -15,6 +15,7 @@ return [
     'send' => 'Enviar',
     'create' => 'Crear',
     'update' => 'Actualizar',
+    'positionsWord' => 'Posiciones',
     'positions' => [
         'gk' => 'Arquero',
         'def' => 'Defensor',
@@ -27,9 +28,21 @@ return [
         'matchDeleted' => 'Partido eliminado correctamente!',
     ],
     'players' => 'Jugadores',
+    'player' => 'Jugador',
     'yourPlayers' => 'Estos son todos los jugadores que estan inscriptos en tus partidos',
     'youSure' => 'Estas seguro?',
     'notAbleRevert' => "No será posible revertir esto!",
     'yesDelete' => 'Si, eliminalo!',
     'deleted' => 'Eliminado!',
+    'auth' => [
+        'passwordReset' => 'Reestrablecer contraseña',
+        'password' => 'Contraseña',
+        'confirmPassword' => 'Confirmar contraseña',
+        'passwordChanged' => 'Contraseña cambiada correctamente',
+        'mail' => [
+            'reset' => [
+                'body' => 'Por favor, haga click en el siguiente enlace para cambiar su constraseña'
+            ]
+        ],
+    ],
 ];

@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AuthController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\UserController;
@@ -74,7 +75,9 @@ Route::group(['middleware' => 'auth'], function () {
     Route::get('match/enrolled/{id}', ['as' => 'matches.enrolled', 'uses' => 'MatchController@enrolled']);
 
     Route::get('players', ['as' => 'players.all', 'uses' => 'PlayerController@showAll']);
-
-
 });
+
+Route::get('/user/recover-password/{encryptedId}',[AuthController::class, 'showRecoverPassword'])->name('recover-password');
+Route::post('/user/recover-password/{encryptedId}',[AuthController::class, 'recoverPassword'])->name('recover-password-post');
+
 

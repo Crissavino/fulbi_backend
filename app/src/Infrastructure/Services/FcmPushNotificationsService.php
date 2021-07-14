@@ -35,6 +35,7 @@ class FcmPushNotificationsService
     static function sendChatTextMessage($notificationTitle, $notificationBody, $data, $devicesTokens)
     {
 
+        Log::info('Bearer ' . env('FCM_KEY'));
         try {
             $client = new Client([
                 'base_uri' => 'https://fcm.googleapis.com',

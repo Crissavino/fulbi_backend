@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\SendRecoveryPasswordEmail;
 use App\Models\Device;
 use App\Models\Location;
 use App\Models\Position;
@@ -10,6 +11,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Testing\Fluent\Concerns\Has;
 
 class AuthController extends Controller
 {
@@ -143,6 +146,61 @@ class AuthController extends Controller
             'message' => 'Successfully logged out'
         ]);
 
+    }
+
+    public function sendRecoveryPasswordEmail(Request $request)
+    {
+        try {
+            $user = User::where('email', $request->email)->firstOrFail();
+
+            $encryptedId = encrypt($user->id);
+            $recoverPasswordUrl = route('recover-password', ['encryptedId' => $encryptedId]);
+
+            $details = [
+                'title' => __('general.auth.passwordReset'),
+                'body' => __('general.auth.mail.reset.body'),
+                'url' => $recoverPasswordUrl,
+            ];
+
+            Mail::to($user->email)->send(new SendRecoveryPasswordEmail($details));
+
+            return response()->json([
+                'success' => true,
+                'user' => $user,
+            ]);
+        } catch (\Exception $exception) {
+            return response()->json([
+                'success' => false,
+                'message' => $exception->getMessage()
+            ]);
+        }
+    }
+
+    public function showRecoverPassword($encryptedId)
+    {
+        $id = decrypt($encryptedId);
+        $user = User::find($id);
+
+        return view('players.recoverPassword', [
+            'email' => $user->email,
+            'encryptedId' => $encryptedId
+        ]);
+    }
+
+    public function recoverPassword(Request $request, $encryptedId)
+    {
+        $id = decrypt($encryptedId);
+        $user = User::find($id);
+
+        $validatedData = $request->validate([
+            'password' => 'required|confirmed|string|min:6'
+        ]);
+
+        $user->update([
+            'password' => Hash::make($validatedData['password'])
+        ]);
+
+        return redirect()->route('home')->with('message', __('general.auth.passwordChanged'));
     }
 
     public function existEmail(Request $request)

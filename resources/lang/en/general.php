@@ -15,6 +15,7 @@ return [
     'send' => 'Send',
     'create' => 'Create',
     'update' => 'Update',
+    'positionsWord' => 'Positions',
     'positions' => [
         'gk' => 'Goalkeeper',
         'def' => 'Defense',
@@ -27,9 +28,22 @@ return [
         'matchDeleted' => 'Match deleted successfully!',
     ],
     'players' => 'Players',
+    'player' => 'Player',
     'yourPlayers' => 'These are all the players who are registered in your matches',
     'youSure' => 'Are you sure?',
     'notAbleRevert' => "You won't be able to revert this!",
     'yesDelete' => 'Yes, delete it!',
+    'deleted' => 'Deleted!',
+    'auth' => [
+        'passwordReset' => 'Reset password',
+        'password' => 'Password',
+        'confirmPassword' => 'Confirm password',
+        'passwordChanged' => 'Password changed successfully',
+        'mail' => [
+            'reset' => [
+                'body' => 'Please, click on the following link to change your password'
+            ]
+        ],
+    ],
 
 ];

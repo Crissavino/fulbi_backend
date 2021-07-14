@@ -3,8 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Models\Match;
-use App\Models\Player;
-use Illuminate\Http\Request;
 
 class PlayerController extends Controller
 {
@@ -15,12 +13,13 @@ class PlayerController extends Controller
         $players = [];
         foreach ($matches as $match) {
             foreach ($match->players as $player) {
-                $players[] = $player;
+                $players[$player->id] = $player;
             }
         }
+        $collect = collect($players);
 
         return view('players.index', [
-            'players' => $players
+            'players' => $collect->unique()
         ]);
 
     }
