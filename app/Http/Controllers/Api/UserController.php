@@ -157,7 +157,7 @@ class UserController extends Controller
         $user = $request->user();
 
         $users = User::whereHas('player.positions')->where('id', '!=', $user->id)
-            ->where('genre_id', $request->genre_id)->with('player.positions');
+            ->whereIn('genre_id', $request->genres_ids)->with('player.positions');
         if ($users->count() === 0) {
             return response()->json([
                 'success' => true,
