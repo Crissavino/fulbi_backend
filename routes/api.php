@@ -26,6 +26,7 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 //Auth
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
+Route::post('/login-with-google', [AuthController::class, 'loginWithGoogle']);
 Route::post('/me', [AuthController::class, 'me'])->middleware('auth:sanctum');
 Route::post('/existEmail',[AuthController::class, 'existEmail']);
 Route::post('/logout',[AuthController::class, 'logout']);

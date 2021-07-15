@@ -7,15 +7,22 @@ use App\Models\Device;
 use App\Models\Location;
 use App\Models\Position;
 use App\Models\User;
+use Google_Client;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Testing\Fluent\Concerns\Has;
+use Intervention\Image\Facades\Image;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 class AuthController extends Controller
 {
+    const GOOGLE_CLIENT_ID_WEB = '265189331222-u4u3kp6crqh7odfavru2dnmq7pltj08q.apps.googleusercontent.com';
+    const GOOGLE_CLIENT_ID_IOS = '265189331222-qb7uvump0qp6mjg1u11eb2opp7cts18s.apps.googleusercontent.com';
+    const GOOGLE_CLIENT_ID_ANDROID = '265189331222-9r086sf5s80tmt0d9tk4b6sjf5pro4lm.apps.googleusercontent.com';
+
     public function register(Request $request)
     {
         $validatedData = $request->validate([
@@ -356,5 +363,114 @@ class AuthController extends Controller
                 'error' => $exception->getMessage()
             ];
         }
+    }
+
+    public function loginWithGoogle(Request $request)
+    {
+//        Log::info('==== $request->id_token ====');
+//        Log::info(json_encode($request->id_token));
+//        die();
+        if (!$request->id_token) {
+            return response()->json([
+                'success' => false,
+            ]);
+        }
+
+//        $clientsString = json_encode([self::GOOGLE_CLIENT_ID_ANDROID,self::GOOGLE_CLIENT_ID_IOS, self::GOOGLE_CLIENT_ID_ANDROID]);
+
+//        $client = new Google_Client(['client_id' => $clientsString]);
+        $client = new Google_Client();
+//        $client->setAccessToken($request->access_token);
+//        $client->setClientId(self::GOOGLE_CLIENT_ID_WEB);
+//        $client->setClientId(self::GOOGLE_CLIENT_ID_IOS);
+//        $client->setClientId(self::GOOGLE_CLIENT_ID_ANDROID);
+//        dd($client);
+
+        try {
+            $payload = $client->verifyIdToken($request->id_token);
+            if ($payload) {
+                $name = $payload['name'];
+                $email = $payload['email'];
+                $image = $payload['picture'];
+
+                $user = User::where('email', $email)->first();
+                if (!$user) {
+                    $nickname = $this->createNickName($name);
+                    $user = User::create([
+                        'name' => $name,
+                        'nickname' => $nickname,
+                        'email' => $email,
+                        'is_fully_set' => false,
+                        'premium' => false,
+                        'matches_created' => 0,
+                        'password' => Hash::make($email),
+                        'profile_image' => $image
+                    ]);
+
+                    $player = $user->player()->create([
+                        'user_id' => $user->id
+                    ]);
+
+                    // attach all the positions
+                    $positionsId = Position::where('sport_id', 1)->get()->pluck('id');
+                    $player->positions()->attach($positionsId);
+
+                    $token = $user->createToken('auth_token')->plainTextToken;
+
+                    $fcmToken = $request->header('Fcm-Token');
+                    $device = Device::updateOrCreate([
+                        'token'   => $fcmToken
+                    ],[
+                        'user_id'     => $user->id,
+                        'token' => $fcmToken
+                    ]);
+
+                    $user->player->positions;
+                    $user->player->location;
+
+                    return response()->json([
+                        'success' => true,
+                        'user' => $user,
+                        'token' => $token,
+                        'fcm_token' => $device->token,
+                        'token_type' => 'Bearer'
+                    ]);
+                }
+
+                $token = $user->createToken('auth_token')->plainTextToken;
+
+                $fcmToken = $request->header('Fcm-Token');
+                $device = Device::updateOrCreate([
+                    'token'   => $fcmToken
+                ],[
+                    'user_id'     => $user->id,
+                    'token' => $fcmToken
+                ]);
+
+
+                $user->player->positions;
+                $user->player->location;
+
+                return response()->json([
+                    'success' => true,
+                    'token' => $token,
+                    'user' => $user,
+                    'fcm_token' => $device->token,
+                    'token_type' => 'Bearer'
+                ]);
+            } else {
+                return response()->json([
+                    'success' => true,
+                    'empty' => true,
+                    'payload' => $payload,
+                ]);
+            }
+        }
+        catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+            ]);
+        }
+
     }
 }

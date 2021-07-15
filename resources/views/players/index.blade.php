@@ -55,7 +55,9 @@
                                                                     <h4 class="card-category text-center font-weight-bold">{{'@'.$player->user->nickname}}</h4>
                                                                 </div>
                                                                 <div class="card-body m-auto text-center">
-                                                                    <img src="{{$player->user->profile_image}}" alt="profile picture" style="width: 150px; height: 150px;border-radius: 50%;">
+                                                                    @if(!is_null($player->user->profile_image))
+                                                                        <img src="{{$player->user->profile_image}}" alt="profile picture" style="width: 150px; height: 150px;border-radius: 50%;">
+                                                                    @endif
                                                                     <h3 class="font-weight-bold">{{__('Usually plays in')}}</h3>
                                                                     <h4>{{$player->location->formatted_address}}</h4>
                                                                     <h3 class="font-weight-bold">{{__('Positions')}}</h3>
