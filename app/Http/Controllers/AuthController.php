@@ -484,6 +484,8 @@ class AuthController extends Controller
         $iat = strtotime('now');
         $exp = strtotime('+60days');
         $code = $request->code;
+        $firstName = $request->first_name;
+        $lastName = $request->last_name;
 
         $client_secret = $this->getClientSecret($teamId, $iat, $exp, $aud, $sub, $keyId);
         $firsResponse = $this->callApple($code, $client_secret);
@@ -505,21 +507,23 @@ class AuthController extends Controller
             $payload = $this->getPayload($secondResponse['id_token']);
 
             if ($payload) {
-                $name = isset($payload->name) ? $payload->name : null;
+                $fullName = null;
+                if ($firstName && $lastName) {
+                    $fullName = $firstName . ' ' . $lastName;
+                }
                 $email = $payload->email;
 
                 $user = User::where('email', $email)->first();
-                if (!$user && $name) {
-                    $nickname = $this->createNickName($name);
+                if (!$user && $fullName) {
+                    $nickname = $this->createNickName($fullName);
                     $user = User::create([
-                        'name' => $name,
+                        'name' => $fullName,
                         'nickname' => $nickname,
                         'email' => $email,
                         'is_fully_set' => false,
                         'premium' => false,
                         'matches_created' => 0,
-                        'password' => Hash::make($email),
-                        'profile_image' => $image
+                        'password' => Hash::make($email)
                     ]);
 
                     $player = $user->player()->create([
