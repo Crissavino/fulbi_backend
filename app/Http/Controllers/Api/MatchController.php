@@ -461,13 +461,18 @@ class MatchController extends Controller
             ]);
         }
 
-        $matches = $matches->sortBy(function($match){
+        $today = Carbon::now(); //$today->toDateTimeString()
+        $matches = $matches->sortBy(function($match) use ($today){
             $match->location;
             $match->cost = number_format($match->cost, 2);
             $match->participants = $match->players->map(function ($player) use ($match){
                 return $player->user;
             });
             return $match->when_play;
+        });
+
+        $matches = $matches->filter(function ($match) use ($today) {
+            return $match->when_play >= $today->toDateTimeString();
         });
 
         return response()->json([
