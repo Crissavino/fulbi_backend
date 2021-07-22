@@ -486,28 +486,16 @@ class AuthController extends Controller
         $code = $request->code;
         $firstName = $request->first_name;
         $lastName = $request->last_name;
-        Log::info('========== env ==========');
-        Log::info(json_encode([env('APPLE_TEAM_ID'), env('APPLE_KEY_ID'), env('APPLE_IOS_SERVICE_ID')]));
-        Log::info('========== env ==========');
 
         $client_secret = $this->getClientSecret($teamId, $iat, $exp, $aud, $sub, $keyId);
-        Log::info('========== $client_secret ==========');
-        Log::info(json_encode($client_secret));
-        Log::info('========== $client_secret ==========');
         $firsResponse = $this->callApple($code, $client_secret);
-        Log::info('========== $firsResponse ==========');
-        Log::info(json_encode($firsResponse));
-        Log::info('========== $firsResponse ==========');
         if (isset($firsResponse['error'])) {
             return response()->json([
                 'success' => false,
-                'message' => 'Login fails, please try again 1',
+                'message' => 'Login fails, please try again',
             ]);
         }
         $secondResponse = $this->callAppleRefreshToken($firsResponse['refresh_token'], $client_secret);
-        Log::info('========== $secondResponse ==========');
-        Log::info(json_encode($secondResponse));
-        Log::info('========== $secondResponse ==========');
         if (isset($secondResponse['error'])) {
             return response()->json([
                 'success' => false,
@@ -517,7 +505,9 @@ class AuthController extends Controller
 
         try {
             $payload = $this->getPayload($secondResponse['id_token']);
-
+            Log::info('========== $payload ==========');
+            Log::info(json_encode($payload));
+            Log::info('========== $payload ==========');
             if ($payload) {
                 $fullName = null;
                 if ($firstName && $lastName) {
@@ -567,7 +557,9 @@ class AuthController extends Controller
                         'token_type' => 'Bearer'
                     ]);
                 }
-
+                Log::info('========== $user ==========');
+                Log::info(json_encode($user));
+                Log::info('========== $user ==========');
                 $token = $user->createToken('auth_token')->plainTextToken;
 
                 $fcmToken = $request->header('Fcm-Token');
