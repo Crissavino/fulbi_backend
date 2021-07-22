@@ -557,6 +557,12 @@ class AuthController extends Controller
                         'token_type' => 'Bearer'
                     ]);
                 }
+                if (!$user && !$fullName) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Please register your user manually',
+                    ]);
+                }
                 Log::info('========== $user ==========');
                 Log::info(json_encode($user));
                 Log::info('========== $user ==========');
