@@ -505,9 +505,6 @@ class AuthController extends Controller
 
         try {
             $payload = $this->getPayload($secondResponse['id_token']);
-            Log::info('========== $payload ==========');
-            Log::info(json_encode($payload));
-            Log::info('========== $payload ==========');
             if ($payload) {
                 $fullName = null;
                 if ($firstName && $lastName) {
@@ -563,9 +560,6 @@ class AuthController extends Controller
                         'message' => 'Please register your user manually',
                     ]);
                 }
-                Log::info('========== $user ==========');
-                Log::info(json_encode($user));
-                Log::info('========== $user ==========');
                 $token = $user->createToken('auth_token')->plainTextToken;
 
                 $fcmToken = $request->header('Fcm-Token');
