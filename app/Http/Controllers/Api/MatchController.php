@@ -438,6 +438,7 @@ class MatchController extends Controller
     {
         Log::info($request->header('Authorization'));
         $matches = Match::all();
+        $matches = $matches->where('is_closed', false);
 
         $gr_circle_radius = 6371;
         $max_distance = $request->range;
@@ -484,8 +485,7 @@ class MatchController extends Controller
             ]);
         }
 
-        $today = Carbon::now(); //$today->toDateTimeString()
-        $matches = $matches->sortBy(function($match) use ($today){
+        $matches = $matches->sortBy(function($match){
             $match->location;
             $match->cost = number_format($match->cost, 2);
             $match->participants = $match->players->map(function ($player) use ($match){
@@ -494,6 +494,7 @@ class MatchController extends Controller
             return $match->when_play;
         });
 
+        $today = Carbon::now();
         $matches = $matches->filter(function ($match) use ($today) {
             return $match->when_play >= $today->toDateTimeString();
         });
@@ -809,8 +810,6 @@ class MatchController extends Controller
     {
         $matches = $this->returnAllMatches($request);
 
-        Log::info(json_encode($matches));
-
         return response()->json([
             'success' => true,
             'matches' => $matches->values()
@@ -821,6 +820,7 @@ class MatchController extends Controller
     {
         $matches = Match::all();
         $matches = $matches->where('owner_id', $request->user()->id);
+        $matches = $matches->where('is_closed', false);
         $matches = $matches->sortBy(function ($match) use ($request) {
             $match->location;
             $match->have_notifications = $match->players()->where('player_id', $request->user()->player->id)
@@ -868,6 +868,7 @@ class MatchController extends Controller
     {
         $matches = Match::all();
         $matches = $matches->where('owner_id', $request->user()->id);
+        $matches = $matches->where('is_closed', false);
         $matches = $matches->merge($request->user()->player->matches);
         $matches = $matches->sortBy(function ($match) use ($request) {
             $match->location;
