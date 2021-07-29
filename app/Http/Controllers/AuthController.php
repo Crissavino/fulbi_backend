@@ -383,6 +383,10 @@ class AuthController extends Controller
 //        $client->setClientId(self::GOOGLE_CLIENT_ID_ANDROID);
 //        dd($client);
 
+        Log::info('========$request========');
+        Log::info(json_encode($request));
+        Log::info('========$request========');
+
         try {
             $payload = $client->verifyIdToken($request->id_token);
             Log::info('========$payload========');
