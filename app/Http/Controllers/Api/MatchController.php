@@ -197,10 +197,11 @@ class MatchController extends Controller
 
     public function getMatch($id)
     {
-
         $match = Match::find($id);
         $match->participants = $match->players()->with(['user'])->get()->pluck('user');
         $match->cost = number_format($match->cost, 2);
+        $match->is_confirmed = $match->players()->where('player_id', request()->user()->player->id)->where('is_confirmed', true)->exists();
+        $match->have_notifications = $match->players()->where('player_id', request()->user()->player->id)->where('have_notifications', true)->exists();
 
         return response()->json([
             'success' => true,
@@ -281,8 +282,30 @@ class MatchController extends Controller
                     ],
                     $userDevicesTokens
                 );
+
+                FcmPushNotificationsService::sendSilence(
+                    'silence_match_edited',
+                    [
+                        'match_id' => $match->id
+                    ],
+                    $userDevicesTokens
+                );
             }
         });
+
+        $message = Message::create([
+            'text' => __('notifications.match.chat.edited', [
+                'userName' => $user->name
+            ]),
+            'owner_id' => $user->id,
+            'chat_id' => $match->chat->id,
+            'type' => 4
+        ]);
+        $message->players()->syncWithoutDetaching($match->players->pluck('id'));
+
+        $match->players()->where('player_id', '<>', $user->player->id)->update([
+            'have_notifications' => true
+        ]);
 
         return [
             'success' => true,
@@ -688,6 +711,20 @@ class MatchController extends Controller
             $userDevicesTokens
         );
 
+        $otherPlayers = $match->players()->where('player_id', '<>', $userWhoJoin->player->id)->get();
+        $otherPlayers->map(function ($player) use ($match){
+            $userDevicesTokens = $player->user->devices->pluck('token')->toArray();
+            if(!empty($userDevicesTokens)) {
+                FcmPushNotificationsService::sendSilence(
+                    'silence_join_match',
+                    [
+                        'match_id' => $match->id
+                    ],
+                    $userDevicesTokens
+                );
+            }
+        });
+
         $match->location;
         $match->cost = number_format($match->cost, 2);
         $match->participants = $match->players->map(function ($player) use ($match) {
@@ -746,6 +783,20 @@ class MatchController extends Controller
             $userDevicesTokens
         );
 
+        $otherPlayers = $match->players()->where('player_id', '<>', $userWhoJoin->player->id)->get();
+        $otherPlayers->map(function ($player) use ($match){
+            $userDevicesTokens = $player->user->devices->pluck('token')->toArray();
+            if(!empty($userDevicesTokens)) {
+                FcmPushNotificationsService::sendSilence(
+                    'silence_leave_match',
+                    [
+                        'match_id' => $match->id
+                    ],
+                    $userDevicesTokens
+                );
+            }
+        });
+
         $matches = $this->returnAllMatches($request);
 
         return response()->json([
@@ -757,6 +808,8 @@ class MatchController extends Controller
     public function getMyMatches(Request $request)
     {
         $matches = $this->returnAllMatches($request);
+
+        Log::info(json_encode($matches));
 
         return response()->json([
             'success' => true,

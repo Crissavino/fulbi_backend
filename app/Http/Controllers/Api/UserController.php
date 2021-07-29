@@ -66,7 +66,7 @@ class UserController extends Controller
     {
         $user = $request->user();
         $userLocationDetails = $request->userLocationDetails;
-        if (!$userLocationDetails['country'] || !$userLocationDetails['place_id'] || !$userLocationDetails['formatted_address'] || !$userLocationDetails['country_code'] || !$userLocationDetails['province'] || !$userLocationDetails['province_code'] || !$userLocationDetails['city']) {
+        if (!$userLocationDetails['country'] || !$userLocationDetails['formatted_address'] || !$userLocationDetails['province'] || !$userLocationDetails['city']) {
             return [
                 'success' => false,
                 'message' => 'Error during save of user locations'
@@ -210,8 +210,6 @@ class UserController extends Controller
                 'users' => []
             ]);
         }
-
-        // TODO agregar coincidence para cada caso mas adelante
 
         return response()->json([
             'success' => true,

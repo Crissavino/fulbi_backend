@@ -303,7 +303,7 @@ class AuthController extends Controller
     {
 
         $userLocationDetails = $request->userLocationDetails;
-        if (!$userLocationDetails['country'] || !$userLocationDetails['place_id'] || !$userLocationDetails['formatted_address'] || !$userLocationDetails['country_code'] || !$userLocationDetails['province'] || !$userLocationDetails['province_code'] || !$userLocationDetails['city']) {
+        if (!$userLocationDetails['country'] || !$userLocationDetails['formatted_address'] || !$userLocationDetails['province'] || !$userLocationDetails['city']) {
             return [
                 'success' => false,
                 'message' => 'Error during save of user locations'
@@ -385,6 +385,9 @@ class AuthController extends Controller
 
         try {
             $payload = $client->verifyIdToken($request->id_token);
+            Log::info('========$payload========');
+            Log::info(json_encode($payload));
+            Log::info('========$payload========');
             if ($payload) {
                 $name = $payload['name'];
                 $email = $payload['email'];

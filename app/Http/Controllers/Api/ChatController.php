@@ -21,7 +21,8 @@ class ChatController extends Controller
         $message = Message::create([
             'text' => $request->text,
             'owner_id' => $request->owner_id,
-            'chat_id' => $request->chat_id
+            'chat_id' => $request->chat_id,
+            'type' => 1
         ]);
 
         $message->players()->syncWithoutDetaching($match->players->pluck('id'));
@@ -36,6 +37,7 @@ class ChatController extends Controller
         $hour = strlen((string)$whenPlay->hour) === 1 ? '0'.$whenPlay->hour : $whenPlay->hour;
         $minutes = strlen((string)$whenPlay->minute) === 1 ? '0'.$whenPlay->minute : $whenPlay->minute;
         $otherPlayers = $match->players()->where('player_id', '<>', $user->player->id)->get();
+        $message->owner;
         $otherPlayers->map(function ($player) use ($message, $request, $match, $day, $month, $hour, $minutes){
             $userDevicesTokens = $player->user->devices->pluck('token')->toArray();
             if(!empty($userDevicesTokens)) {
@@ -48,6 +50,15 @@ class ChatController extends Controller
                     $message->text,
                     [
                         'chat_id' => $request->chat_id,
+                        'match_id' => $match->id
+                    ],
+                    $userDevicesTokens
+                );
+
+                FcmPushNotificationsService::sendSilence(
+                    'silence_new_chat_message',
+                    [
+                        'message' => $message,
                         'match_id' => $match->id
                     ],
                     $userDevicesTokens
@@ -85,7 +96,7 @@ class ChatController extends Controller
             })->take(10);
         }
 
-        $this->readNotifications($request, $match);
+        $this->readChatNotifications($request, $match);
 
         return response()->json([
             'success' => true,
@@ -94,12 +105,44 @@ class ChatController extends Controller
 
     }
 
-    public function readNotifications(Request $request, Match $match)
+    public function readChatMessages(Request $request)
+    {
+        $match = Match::find($request->match_id);
+        $player = $request->user()->player;
+        $match->players()->where('player_id', $player->id)->update([
+            'have_notifications' => false
+        ]);
+
+        $userDevicesTokens = $player->user->devices->pluck('token')->toArray();
+        FcmPushNotificationsService::sendSilence(
+            'silence_chat_notification_read',
+            [
+                'match_id' => $match->id
+            ],
+            $userDevicesTokens
+        );
+
+        return response()->json([
+            'success' => true,
+        ]);
+
+    }
+
+    public function readChatNotifications(Request $request, Match $match)
     {
         $player = $request->user()->player;
         $match->players()->where('player_id', $player->id)->update([
             'have_notifications' => false
         ]);
+
+        $userDevicesTokens = $player->user->devices->pluck('token')->toArray();
+        FcmPushNotificationsService::sendSilence(
+            'silence_chat_notification_read',
+            [
+                'match_id' => $match->id
+            ],
+            $userDevicesTokens
+        );
 
     }
 

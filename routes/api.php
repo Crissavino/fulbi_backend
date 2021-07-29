@@ -53,6 +53,7 @@ Route::post('/matches/join-match-from-invitation-link-existing-user',[MatchContr
 // Chat
 Route::post('/chat/send-message',[ChatController::class, 'sendMessage'])->middleware('auth:sanctum');
 Route::post('/chat/my-messages',[ChatController::class, 'myMessages'])->middleware('auth:sanctum');
+Route::post('/chat/read-messages',[ChatController::class, 'readChatMessages'])->middleware('auth:sanctum');
 // Chat
 
 //User

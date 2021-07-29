@@ -307,4 +307,44 @@ class FcmPushNotificationsService
         }
     }
 
+    static function sendSilence($silenceType, $data, $devicesTokens)
+    {
+
+        try {
+            $client = new Client([
+                'base_uri' => 'https://fcm.googleapis.com',
+                'timeout' => 10.0
+            ]);
+            $data['notification_type'] = $silenceType;
+            $response = $client->request('post', '/fcm/send',[
+                'headers' => [
+                    'Content-Type' => 'application/json',
+                    'Authorization' => 'Bearer ' . env('FCM_KEY'),
+                ],
+                'json' => [
+                    "content_available" => true,
+                    "apns-priority" => 5,
+                    "registration_ids" => $devicesTokens,
+                    "data" => $data
+                ]
+            ]);
+
+            Log::info("devicesTokens ============");
+            Log::info(json_encode($devicesTokens));
+            Log::info("============ devicesTokens");
+
+            $body = $response->getBody();
+            $bodyContent = $body->getContents();
+            Log::info("BODY ============");
+            Log::info(json_encode($body));
+            Log::info("============ BODY");
+            Log::info("BODY CONTENT ============");
+            Log::info(json_encode($bodyContent));
+            Log::info("============ BODY CONTENT");
+
+        } catch (GuzzleException $e) {
+            Log::info($e->getMessage());
+        }
+    }
+
 }
