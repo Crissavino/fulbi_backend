@@ -316,11 +316,6 @@ class AuthController extends Controller
         ];
     }
 
-    /**
-     * @param $user
-     * @param $userLocationDetails
-     * @return array|bool[]
-     */
     protected function saveUserLocation($user, $userLocationDetails): array
     {
         try {
@@ -604,15 +599,6 @@ class AuthController extends Controller
 
     }
 
-    /**
-     * @param $teamId
-     * @param int $iat
-     * @param int $exp
-     * @param string $aud
-     * @param $sub
-     * @param $keyId
-     * @return false|string
-     */
     protected function getClientSecret($teamId, int $iat, int $exp, string $aud, $sub, $keyId)
     {
         $keyContent = file_get_contents(base_path() . '/AuthKey_SignIn.p8');
