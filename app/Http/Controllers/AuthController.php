@@ -370,7 +370,6 @@ class AuthController extends Controller
             ]);
         }
 
-//        $client = new Google_Client(['client_id' => $clientsString]);
         $client = new Google_Client();
 //        $client->setAccessToken($request->access_token);
 //        $client->setClientId(self::GOOGLE_CLIENT_ID_WEB);
