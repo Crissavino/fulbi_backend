@@ -384,7 +384,7 @@ class AuthController extends Controller
 //        dd($client);
 
         Log::info('========$request========');
-        Log::info(json_encode($request->all()));
+        Log::info(json_encode($request->id_token));
         Log::info('========$request========');
 
         try {
