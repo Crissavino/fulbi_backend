@@ -2,7 +2,6 @@
 
 namespace App\Console\Commands;
 
-use App\Models\Match;
 use Carbon\Carbon;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Log;
@@ -41,7 +40,7 @@ class CloseMatches extends Command
     public function handle()
     {
         $today = Carbon::now();
-        $matches = Match::all();
+        $matches = \App\Models\Match::all();
 
         $matches = $matches->where('is_closed', false);
         $matches = $matches->filter(function ($match) use ($today) {
