@@ -169,8 +169,9 @@ class AuthController extends Controller
         $token = $user->tokens()->where('token', $headerToken)->first();
         $token->delete();
 
-        // TODO borrar token del device
-
+        $user->devices->each(function ($device){
+            $device->update(['token' => null]);
+        });
         return response()->json([
             'success' => true,
             'message' => 'Successfully logged out'
