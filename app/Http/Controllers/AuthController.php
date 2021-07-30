@@ -91,13 +91,19 @@ class AuthController extends Controller
         Log::info(json_encode($device));
         Log::info('=======$device=====');
 
-        return response()->json([
+        $response = response()->json([
             'success' => true,
             'user' => $user,
             'token' => $token,
             'fcm_token' => $device->token,
             'token_type' => 'Bearer'
         ]);
+
+        Log::info('=======$response=====');
+        Log::info(json_encode($response));
+        Log::info('=======$response=====');
+
+        return $response;
     }
 
     public function createNickName($name)
