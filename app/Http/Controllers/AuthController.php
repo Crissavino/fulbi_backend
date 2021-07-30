@@ -37,6 +37,9 @@ class AuthController extends Controller
         ]);
 
         $nickname = $this->createNickName($validatedData['name']);
+        Log::info('=======$nickname=====');
+        Log::info(json_encode($nickname));
+        Log::info('=======$nickname=====');
         $user = User::create([
             'name' => $validatedData['name'],
             'nickname' => $nickname,
@@ -47,15 +50,31 @@ class AuthController extends Controller
             'password' => Hash::make($validatedData['password'])
         ]);
 
+        Log::info('=======$user=====');
+        Log::info(json_encode($user));
+        Log::info('=======$user=====');
+
         $player = $user->player()->create([
             'user_id' => $user->id
         ]);
+
+        Log::info('=======$player=====');
+        Log::info(json_encode($player));
+        Log::info('=======$player=====');
 
         // attach all the positions
         $positionsId = Position::where('sport_id', 1)->get()->pluck('id');
         $player->positions()->attach($positionsId);
 
+        Log::info('=======$positionsId=====');
+        Log::info(json_encode($positionsId));
+        Log::info('=======$positionsId=====');
+
         $token = $user->createToken('auth_token')->plainTextToken;
+
+        Log::info('=======$token=====');
+        Log::info(json_encode($token));
+        Log::info('=======$token=====');
 
         $fcmToken = $request->header('Fcm-Token');
         $device = Device::updateOrCreate([
@@ -64,6 +83,13 @@ class AuthController extends Controller
             'user_id'     => $user->id,
             'token' => $fcmToken
         ]);
+
+        Log::info('=======$fcmToken=====');
+        Log::info(json_encode($fcmToken));
+        Log::info('=======$fcmToken=====');
+        Log::info('=======$device=====');
+        Log::info(json_encode($device));
+        Log::info('=======$device=====');
 
         return response()->json([
             'success' => true,
