@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Testing\Fluent\Concerns\Has;
+use Illuminate\Validation\ValidationException;
 use Intervention\Image\Facades\Image;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Firebase\JWT\JWK;
@@ -27,16 +28,29 @@ class AuthController extends Controller
 
     public function register(Request $request)
     {
-        $validatedData = $request->validate(
-            [
-                'name' => 'required|string|max:255',
-                'email' => 'required|string|email|max:255|unique:users',
-                'password' => 'required|string|min:6'
-            ],
-            [
-                'email.unique' => __('errors.auth.mailTaken'),
-            ]
-        );
+        try {
+            $validatedData = $request->validate(
+                [
+                    'name' => 'required|string|max:255',
+                    'email' => 'required|string|email|max:255|unique:users',
+                    'password' => 'required|string|min:6'
+                ],
+                [
+                    'email.unique' => __('errors.auth.mailTaken'),
+                ]
+            );
+        } catch (ValidationException $e) {
+            foreach ($e->errors() as $error) {
+                return response()->json([
+                    'success' => false,
+                    'message' => $error[0]
+                ]);
+            }
+            return response()->json([
+                'success' => false,
+                'message' => __('errors.somethingHappened')
+            ]);
+        }
 
         $nickname = $this->createNickName($validatedData['name']);
         $user = User::create([
