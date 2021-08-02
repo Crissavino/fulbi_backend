@@ -41,6 +41,7 @@ class MatchController extends Controller
         $when_play = $parameters['when_play'];
         $genre_id = $parameters['genre_id'];
         $type_id = $parameters['type_id'];
+        $is_free_match = $parameters['is_free_match'];
         $currency_id = $parameters['currency_id'];
         $cost = $parameters['cost'];
         $num_players = $parameters['num_players'];
@@ -75,6 +76,7 @@ class MatchController extends Controller
             $genre_id,
             $type_id,
             $num_players,
+            $is_free_match,
             $currency_id,
             $cost,
             $chat->id,
@@ -150,20 +152,25 @@ class MatchController extends Controller
             ];
         }
 
-        $currencyId = intval($request->currency_id);
-        if (!$currencyId) {
-            return [
-                'success' => false,
-                'message' => __('errors.missingParameter')
-            ];
-        }
+        $isFreeMatch = boolval($request->is_free_match);
+        $currencyId = null;
+        $cost = null;
+        if (!$isFreeMatch) {
+            $currencyId = intval($request->currency_id);
+            if (!$currencyId) {
+                return [
+                    'success' => false,
+                    'message' => __('errors.missingParameter')
+                ];
+            }
 
-        $cost = doubleval($request->cost);
-        if (!$cost) {
-            return [
-                'success' => false,
-                'message' => __('errors.missingParameter')
-            ];
+            $cost = doubleval($request->cost);
+            if (!$cost) {
+                return [
+                    'success' => false,
+                    'message' => __('errors.missingParameter')
+                ];
+            }
         }
 
         $numPlayers = intval($request->num_players);
@@ -182,11 +189,12 @@ class MatchController extends Controller
             ];
         }
 
-        return [
+         return [
             'success' => true,
             'when_play' => $whenPlay,
             'genre_id' => $genreId,
             'type_id' => $typeId,
+            'is_free_match' => $isFreeMatch,
             'currency_id' => $currencyId,
             'cost' => $cost,
             'num_players' => $numPlayers,
@@ -226,6 +234,7 @@ class MatchController extends Controller
         $when_play = $parameters['when_play'];
         $genre_id = $parameters['genre_id'];
         $type_id = $parameters['type_id'];
+        $is_free_match = $parameters['is_free_match'];
         $currency_id = $parameters['currency_id'];
         $cost = $parameters['cost'];
         $num_players = $parameters['num_players'];
@@ -258,6 +267,7 @@ class MatchController extends Controller
             $genre_id,
             $type_id,
             $num_players,
+            $is_free_match,
             $currency_id,
             $cost
         );
@@ -349,20 +359,25 @@ class MatchController extends Controller
             ];
         }
 
-        $currencyId = floatval($request->currency_id);
-        if (!$currencyId) {
-            return [
-                'success' => false,
-                'message' => __('errors.missingParameter')
-            ];
-        }
+        $isFreeMatch = boolval($request->is_free_match);
+        $currencyId = null;
+        $cost = null;
+        if(!$isFreeMatch) {
+            $currencyId = floatval($request->currency_id);
+            if (!$currencyId) {
+                return [
+                    'success' => false,
+                    'message' => __('errors.missingParameter')
+                ];
+            }
 
-        $cost = doubleval($request->cost);
-        if (!$cost) {
-            return [
-                'success' => false,
-                'message' => __('errors.missingParameter')
-            ];
+            $cost = doubleval($request->cost);
+            if (!$cost) {
+                return [
+                    'success' => false,
+                    'message' => __('errors.missingParameter')
+                ];
+            }
         }
 
         $numPlayers = intval($request->num_players);
@@ -386,6 +401,7 @@ class MatchController extends Controller
             'when_play' => $whenPlay,
             'genre_id' => $genreId,
             'type_id' => $typeId,
+            'is_free_match' => $isFreeMatch,
             'currency_id' => $currencyId,
             'cost' => $cost,
             'num_players' => $numPlayers,

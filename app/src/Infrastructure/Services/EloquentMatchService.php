@@ -10,7 +10,7 @@ use App\src\Domain\Services\MatchService;
 class EloquentMatchService implements MatchService
 {
 
-    public function create($locationId, $when_play, $genre_id, $type_id, $num_players, $currency_id, $cost, $chatId, $userId)
+    public function create($locationId, $when_play, $genre_id, $type_id, $num_players, $is_free_match, $currency_id, $cost, $chatId, $userId)
     {
         return Match::create([
             'location_id' => $locationId,
@@ -18,6 +18,7 @@ class EloquentMatchService implements MatchService
             'genre_id' => $genre_id,
             'type_id' => $type_id,
             'num_players' => $num_players,
+            'is_free_match' => $is_free_match,
             'currency_id' => $currency_id,
             'cost' => $cost,
             'chat_id' => $chatId,
@@ -30,13 +31,14 @@ class EloquentMatchService implements MatchService
         return Match::find($matchId);
     }
 
-    public function update($matchId, $when_play, $genre_id, $type_id, $num_players, $currency_id, $cost)
+    public function update($matchId, $when_play, $genre_id, $type_id, $num_players, $is_free_match, $currency_id, $cost)
     {
         Match::find($matchId)->update([
             'when_play' => $when_play,
             'genre_id' => $genre_id,
             'type_id' => $type_id,
             'num_players' => $num_players,
+            'is_free_match' => $is_free_match,
             'currency_id' => $currency_id,
             'cost' => $cost,
         ]);

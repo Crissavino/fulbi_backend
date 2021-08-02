@@ -16,6 +16,7 @@ class Match extends Model
         'genre_id',
         'type_id',
         'num_players',
+        'is_free_match',
         'cost',
         'chat_id',
         'owner_id',

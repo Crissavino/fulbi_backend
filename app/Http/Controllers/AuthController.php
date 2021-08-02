@@ -75,10 +75,12 @@ class AuthController extends Controller
 
         $fcmToken = $request->header('Fcm-Token');
         $device = Device::updateOrCreate([
+            'user_id'     => $user->id,
+            'uuid' => $request->uuid,
             'token'   => $fcmToken
         ],[
             'user_id'     => $user->id,
-            'token' => $fcmToken
+            'uuid' => $request->uuid
         ]);
 
         $response = response()->json([
@@ -122,12 +124,11 @@ class AuthController extends Controller
 
         $fcmToken = $request->header('Fcm-Token');
         $device = Device::updateOrCreate([
-            'token'   => $fcmToken
+            'token'   => $fcmToken,
         ],[
             'user_id'     => $user->id,
-            'token' => $fcmToken
+            'uuid' => $request->uuid
         ]);
-
 
         $user->player->positions;
         $user->player->location;
@@ -156,6 +157,9 @@ class AuthController extends Controller
     {
 
         $user = $request->user();
+        if (!$user) {
+            $user = User::find($request->user_id);
+        }
 
         if (!$user) {
             return response()->json([
@@ -167,11 +171,11 @@ class AuthController extends Controller
 
         $headerToken = explode(' ', $request->header('authorization'))[1];
         $token = $user->tokens()->where('token', $headerToken)->first();
-        $token->delete();
+        if ($token) $token->delete();
 
-        $user->devices->each(function ($device){
-            $device->update(['token' => null]);
-        });
+        $device = $user->devices->where('uuid', $request->uuid)->first();
+        $device->update(['token' => null]);
+
         return response()->json([
             'success' => true,
             'message' => 'Successfully logged out'
@@ -439,10 +443,12 @@ class AuthController extends Controller
 
                     $fcmToken = $request->header('Fcm-Token');
                     $device = Device::updateOrCreate([
+                        'user_id'     => $user->id,
+                        'uuid' => $request->uuid,
                         'token'   => $fcmToken
                     ],[
                         'user_id'     => $user->id,
-                        'token' => $fcmToken
+                        'uuid' => $request->uuid
                     ]);
 
                     $user->player->positions;
@@ -461,12 +467,13 @@ class AuthController extends Controller
 
                 $fcmToken = $request->header('Fcm-Token');
                 $device = Device::updateOrCreate([
+                    'user_id'     => $user->id,
+                    'uuid' => $request->uuid,
                     'token'   => $fcmToken
                 ],[
                     'user_id'     => $user->id,
-                    'token' => $fcmToken
+                    'uuid' => $request->uuid
                 ]);
-
 
                 $user->player->positions;
                 $user->player->location;
@@ -480,13 +487,12 @@ class AuthController extends Controller
                 ]);
             } else {
                 return response()->json([
-                    'success' => true,
-                    'empty' => true,
-                    'payload' => $payload,
+                    'success' => false,
                 ]);
             }
-        }
-        catch (\Exception $e) {
+        } catch (\Exception $e) {
+            Log::info('Error when sign in with Google');
+            Log::info($e->getMessage());
             return response()->json([
                 'success' => false,
             ]);
@@ -560,10 +566,12 @@ class AuthController extends Controller
 
                     $fcmToken = $request->header('Fcm-Token');
                     $device = Device::updateOrCreate([
+                        'user_id'     => $user->id,
+                        'uuid' => $request->uuid,
                         'token'   => $fcmToken
                     ],[
                         'user_id'     => $user->id,
-                        'token' => $fcmToken
+                        'uuid' => $request->uuid
                     ]);
 
                     $user->player->positions;
@@ -587,12 +595,13 @@ class AuthController extends Controller
 
                 $fcmToken = $request->header('Fcm-Token');
                 $device = Device::updateOrCreate([
+                    'user_id'     => $user->id,
+                    'uuid' => $request->uuid,
                     'token'   => $fcmToken
                 ],[
                     'user_id'     => $user->id,
-                    'token' => $fcmToken
+                    'uuid' => $request->uuid
                 ]);
-
 
                 $user->player->positions;
                 $user->player->location;
@@ -606,13 +615,12 @@ class AuthController extends Controller
                 ]);
             } else {
                 return response()->json([
-                    'success' => true,
-                    'empty' => true,
-                    'payload' => $payload,
+                    'success' => false,
                 ]);
             }
-        }
-        catch (\Exception $e) {
+        } catch (\Exception $e) {
+            Log::info('Error when sign in with apple');
+            Log::info($e->getMessage());
             return response()->json([
                 'success' => false,
             ]);
@@ -623,6 +631,7 @@ class AuthController extends Controller
     protected function getClientSecret($teamId, int $iat, int $exp, string $aud, $sub, $keyId)
     {
         $keyContent = file_get_contents(base_path() . '/AuthKey_SignIn.p8');
+        \Firebase\JWT\JWT::$leeway = 5;
         return JWT::encode([
             'iss' => $teamId,
             'iat' => $iat,
