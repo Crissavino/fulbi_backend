@@ -825,6 +825,7 @@ class MatchController extends Controller
     public function getMyMatches(Request $request)
     {
         $matches = $this->returnAllMatches($request);
+        $matches = $matches->where('is_closed', false);
 
         return response()->json([
             'success' => true,
