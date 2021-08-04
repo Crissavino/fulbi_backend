@@ -512,7 +512,7 @@ class MatchController extends Controller
 
         $today = Carbon::now();
         $matches = $matches->filter(function ($match) use ($today) {
-            return $match->when_play >= $today->toDateTimeString();
+            return $match->when_play > $today->toDateTimeString();
         });
 
         return response()->json([
@@ -548,6 +548,12 @@ class MatchController extends Controller
             [
                 'match_id' => $match->id
             ],
+            $userDevicesTokens
+        );
+
+        FcmPushNotificationsService::sendSilence(
+            'silence_invited_match',
+            [],
             $userDevicesTokens
         );
 
@@ -588,6 +594,12 @@ class MatchController extends Controller
             $userDevicesTokens
         );
 
+        FcmPushNotificationsService::sendSilence(
+            'silence_invited_match',
+            [],
+            $userDevicesTokens
+        );
+
         $match->players()->syncWithoutDetaching($userToInvite->player->id);
 
         return response()->json([
@@ -622,6 +634,12 @@ class MatchController extends Controller
             [
                 'match_id' => $match->id
             ],
+            $userDevicesTokens
+        );
+
+        FcmPushNotificationsService::sendSilence(
+            'silence_invited_match',
+            [],
             $userDevicesTokens
         );
 
@@ -825,6 +843,10 @@ class MatchController extends Controller
     public function getMyMatches(Request $request)
     {
         $matches = $this->returnAllMatches($request);
+        $today = Carbon::now();
+        $matches = $matches->filter(function ($match) use ($today) {
+            return $match->when_play > $today->toDateTimeString();
+        });
         $matches = $matches->where('is_closed', false);
 
         return response()->json([
@@ -836,6 +858,10 @@ class MatchController extends Controller
     public function getMyCreatedMatches(Request $request)
     {
         $matches = Match::all();
+        $today = Carbon::now();
+        $matches = $matches->filter(function ($match) use ($today) {
+            return $match->when_play > $today->toDateTimeString();
+        });
         $matches = $matches->where('owner_id', $request->user()->id);
         $matches = $matches->where('is_closed', false);
         $matches = $matches->sortBy(function ($match) use ($request) {
