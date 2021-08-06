@@ -518,6 +518,9 @@ class AuthController extends Controller
 
         $client_secret = $this->getClientSecret($teamId, $iat, $exp, $aud, $sub, $keyId);
         $firsResponse = $this->callApple($code, $client_secret);
+        Log::info('========== $firsResponse ==========');
+        Log::info(json_encode($firsResponse));
+        Log::info('========== $firsResponse ==========');
         if (isset($firsResponse['error'])) {
             return response()->json([
                 'success' => false,
@@ -525,10 +528,13 @@ class AuthController extends Controller
             ]);
         }
         $secondResponse = $this->callAppleRefreshToken($firsResponse['refresh_token'], $client_secret);
+        Log::info('========== $secondResponse ==========');
+        Log::info(json_encode($secondResponse));
+        Log::info('========== $secondResponse ==========');
         if (isset($secondResponse['error'])) {
             return response()->json([
                 'success' => false,
-                'message' => 'Login fails, please try again 2',
+                'message' => 'Login fails, please try again',
             ]);
         }
 
