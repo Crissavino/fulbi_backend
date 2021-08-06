@@ -507,7 +507,7 @@ FACEBOOK: https://www.facebook.com/themefisher
                 action="@if(request()->path() === '/') {{route('changeLang')}} @elseif(request()->path() === 'home') {{route('changeLangHome')}} @else {{route('changeLang')}} @endif"
                 method="POST" id="changeLang">
                 @csrf
-                <select class="btn btn-rounded-icon" name="lang" style="width: 250px">
+                <select id="selectLangSelect" class="btn btn-rounded-icon" name="lang" style="width: 200px">
                     <option @if(Illuminate\Support\Facades\App::getLocale() === 'en') selected @endif value="en">English</option>
                     <option @if(Illuminate\Support\Facades\App::getLocale() === 'es') selected @endif value="es">Español</option>
                 </select>
