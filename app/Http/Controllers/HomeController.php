@@ -2,6 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\App;
+
 class HomeController extends Controller
 {
     /**
@@ -11,17 +14,30 @@ class HomeController extends Controller
      */
     public function __construct()
     {
-        $this->middleware('auth');
-        $this->middleware('setLocale');
+//        $this->middleware('setLocale');
     }
 
-    /**
-     * Show the application dashboard.
-     *
-     * @return \Illuminate\View\View
-     */
-    public function index()
+    public function index(Request $request)
     {
-        return view('dashboard');
+        $locale = $request->getLocale();
+        if (! in_array($locale, ['en', 'es'])) {
+            $locale = 'en';
+        }
+
+        App::setLocale($locale);
+
+        return view('landing.home');
+    }
+
+    public function changeLang(Request $request)
+    {
+        $locale = $request->lang;
+        if (! in_array($locale, ['en', 'es'])) {
+            $locale = 'en';
+        }
+
+        App::setLocale($locale);
+
+        return view('landing.home');
     }
 }

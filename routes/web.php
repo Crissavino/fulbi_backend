@@ -28,7 +28,9 @@ Auth::routes();
 //Auth::routes();
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
+Route::post('/', [HomeController::class, 'changeLang'])->name('changeLang');
 Route::get('/home', [HomeController::class, 'index'])->name('home');
+Route::post('/home', [HomeController::class, 'changeLang'])->name('changeLangHome');
 
 Route::group(['middleware' => 'auth'], function () {
 	Route::get('table-list', function () {

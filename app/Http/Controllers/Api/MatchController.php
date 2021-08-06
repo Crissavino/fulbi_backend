@@ -510,10 +510,18 @@ class MatchController extends Controller
             return $match->when_play;
         });
 
-        $today = Carbon::now();
-        $matches = $matches->filter(function ($match) use ($today) {
-            return $match->when_play > $today->toDateTimeString();
-        });
+        if ($request->when_play) {
+            $whenPlay = Carbon::parse($request->when_play)->toDateTimeString();
+            $whenPlay = Carbon::createFromFormat('Y-m-d H:i:s', $whenPlay);
+            $matches = $matches->filter(function ($match) use ($whenPlay) {
+                return $match->when_play > $whenPlay;
+            })->take(10);
+        } else {
+            $today = Carbon::now();
+            $matches = $matches->filter(function ($match) use ($today) {
+                return $match->when_play > $today->toDateTimeString();
+            })->take(10);
+        }
 
         return response()->json([
             'success' => true,
