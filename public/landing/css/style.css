@@ -17,7 +17,7 @@ FACEBOOK: https://www.facebook.com/themefisher
 @import url("https://fonts.googleapis.com/css?family=Lora:400,400i|Open+Sans:300,400,600,700,800");
 body {
   font-family: "Open Sans", sans-serif;
-  -webkit-font-smoothing: antialiased;
+    -webkit-font-smoothing: antialiased;
 }
 
 h1, h2, h3, h4, h5, h6 {
@@ -2228,9 +2228,8 @@ hr {
     margin-right: 60px;
 }
 
-@media (min-width: 420px) {
+@media (max-width: 420px) {
     .infoChatParticipantsImage {
-        max-width: 80%;
         margin-right: 30px;
     }
 }

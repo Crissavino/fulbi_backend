@@ -28,8 +28,8 @@ FACEBOOK: https://www.facebook.com/themefisher
     <!-- Mobile Specific Metas
     ================================================== -->
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="description" content="Fulbito">
-    <meta name="viewport" content="{!! __('landing.matches-all-one-place') !!}">
+    <meta name="description" content="{!! __('landing.matches-all-one-place') !!}">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <meta name="author" content="jackCode">
 
     <meta property="og:title" content="{!! __('landing.title') !!}">
@@ -87,7 +87,7 @@ FACEBOOK: https://www.facebook.com/themefisher
                 <a href="#android" id="downloadButton" class="btn btn-main-md">{!! __('landing.download') !!}</a>
             </div>
             <div class="col-md-6 text-center order-1 order-md-2">
-                <img class="img-fluid" src="{{asset('landing/images/mobile-2.png')}}" alt="screenshot" style="max-width: 70% !important;">
+                <img id="headerImage" class="img-fluid" src="{{asset('landing/images/mobile-2.png')}}" alt="screenshot" style="max-width: 70% !important;">
             </div>
         </div>
     </div>
@@ -507,7 +507,7 @@ FACEBOOK: https://www.facebook.com/themefisher
                 action="@if(request()->path() === '/') {{route('changeLang')}} @elseif(request()->path() === 'home') {{route('changeLangHome')}} @else {{route('changeLang')}} @endif"
                 method="POST" id="changeLang">
                 @csrf
-                <select class="btn btn-rounded-icon" name="lang" style="width: 200px">
+                <select class="btn btn-rounded-icon" name="lang" style="width: 250px">
                     <option @if(Illuminate\Support\Facades\App::getLocale() === 'en') selected @endif value="en">English</option>
                     <option @if(Illuminate\Support\Facades\App::getLocale() === 'es') selected @endif value="es">Español</option>
                 </select>
