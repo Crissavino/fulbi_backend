@@ -34,7 +34,9 @@ FACEBOOK: https://www.facebook.com/themefisher
     <meta name="generator" content="Themefisher Small Apps Template v1.0">
 
     <!-- Favicon -->
-    <link rel="shortcut icon" type="image/x-icon" href="images/favicon.png" />
+    <link rel="shortcut icon" type="image/x-icon" href="{{asset('favicon.ico')}}" />
+    <link rel="apple-touch-icon" sizes="76x76" href="{{asset('apple-icon.png')}}">
+    <link rel="icon" type="image/png" href="{{asset('favicon.ico')}}">
 
     <!-- PLUGINS CSS STYLE -->
     <link rel="stylesheet" href="{{asset('landing/plugins/bootstrap/bootstrap.min.css')}}">
