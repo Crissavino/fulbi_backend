@@ -517,6 +517,9 @@ class AuthController extends Controller
         $lastName = $request->last_name;
 
         $client_secret = $this->getClientSecret($teamId, $iat, $exp, $aud, $sub, $keyId);
+        Log::info('========== $client_secret ==========');
+        Log::info(json_encode($client_secret));
+        Log::info('========== $client_secret ==========');
         $firsResponse = $this->callApple($code, $client_secret);
         Log::info('========== $firsResponse ==========');
         Log::info(json_encode($firsResponse));
