@@ -34,8 +34,10 @@ FACEBOOK: https://www.facebook.com/themefisher
 
     <meta property="og:title" content="{!! __('landing.title') !!}">
     <meta property="og:description" content="{!! __('landing.matches-all-one-place') !!}">
-    <meta property="og:image" content="{{asset('landing/images/create-edit-match.png')}}">
     <meta property="og:url" content="{{route('home')}}">
+    <meta property="og:image" content="{{asset('landing/images/create-edit-match.png')}}">
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
 
     <!-- Favicon -->
     <link rel="shortcut icon" type="image/x-icon" href="{{asset('favicon.ico')}}" />
