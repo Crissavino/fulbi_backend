@@ -28,10 +28,14 @@ FACEBOOK: https://www.facebook.com/themefisher
     <!-- Mobile Specific Metas
     ================================================== -->
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="description" content="Bootstrap App Landing Template">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
-    <meta name="author" content="Themefisher">
-    <meta name="generator" content="Themefisher Small Apps Template v1.0">
+    <meta name="description" content="Fulbito">
+    <meta name="viewport" content="{!! __('landing.matches-all-one-place') !!}">
+    <meta name="author" content="jackCode">
+
+    <meta property="og:title" content="{!! __('landing.title') !!}">
+    <meta property="og:description" content="{!! __('landing.matches-all-one-place') !!}">
+    <meta property="og:image" content="{{asset('landing/images/create-edit-match.png')}}">
+    <meta property="og:url" content="{{route('home')}}">
 
     <!-- Favicon -->
     <link rel="shortcut icon" type="image/x-icon" href="{{asset('favicon.ico')}}" />
@@ -83,7 +87,7 @@ FACEBOOK: https://www.facebook.com/themefisher
                 <a href="#android" id="downloadButton" class="btn btn-main-md">{!! __('landing.download') !!}</a>
             </div>
             <div class="col-md-6 text-center order-1 order-md-2">
-                <img class="img-fluid" src="landing/images/mobile-2.png" alt="screenshot" style="max-width: 70% !important;">
+                <img class="img-fluid" src="{{asset('landing/images/mobile-2.png')}}" alt="screenshot" style="max-width: 70% !important;">
             </div>
         </div>
     </div>
@@ -99,7 +103,7 @@ FACEBOOK: https://www.facebook.com/themefisher
             <div class="col-lg-6 ml-auto justify-content-center">
                 <!-- Feature Mockup -->
                 <div class="image-content" data-aos="fade-right">
-                    <img class="img-fluid" src="landing/images/create-edit-match.png" alt="iphone">
+                    <img class="img-fluid" src="{{asset('landing/images/create-edit-match.png')}}" alt="iphone">
                 </div>
             </div>
             <div class="col-lg-6 mr-auto align-self-center">
