@@ -646,7 +646,7 @@ class AuthController extends Controller
         ], $keyContent, 'ES256', $keyId);
     }
 
-    protected function callApple($code, $client_secret)
+    protected function callAppleTest($code, $client_secret)
     {
         try {
 
@@ -675,7 +675,7 @@ class AuthController extends Controller
         }
     }
 
-    protected function callApple2($code, $client_secret)
+    protected function callApple($code, $client_secret)
     {
         try {
             $curl = curl_init();
