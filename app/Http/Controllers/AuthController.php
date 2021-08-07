@@ -655,7 +655,7 @@ class AuthController extends Controller
                 'client_secret' => $client_secret,
                 'code' => $code,
                 'grant_type' => 'authorization_code',
-                'redirect_uri' => 'https%3A%2F%2F4a1a558b3ff6.ngrok.io%2Fapi%2Flogin-with-apple'
+                'redirect_uri' => 'https://fulbito.app/api/login-with-apple'
             ];
 
             $ch = curl_init();
@@ -689,7 +689,7 @@ class AuthController extends Controller
                 CURLOPT_FOLLOWLOCATION => true,
                 CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
                 CURLOPT_CUSTOMREQUEST => 'POST',
-                CURLOPT_POSTFIELDS => 'grant_type=authorization_code&code='.$code.'&redirect_uri=https%3A%2F%2F4a1a558b3ff6.ngrok.io%2Fapi%2Flogin-with-apple&client_id='.env('APPLE_IOS_SERVICE_ID').'&client_secret='.$client_secret,
+                CURLOPT_POSTFIELDS => 'grant_type=authorization_code&code='.$code.'&redirect_uri=https%3A%2F%2Ffulbito.app%2Fapi%2Flogin-with-apple&client_id='.env('APPLE_IOS_SERVICE_ID').'&client_secret='.$client_secret,
                 CURLOPT_HTTPHEADER => array(
                     'Fcm-Token: f09Jwl2WSaumuWIv9coWJp:APA91bHuHy8gK_LIvYbP_lprEmU6_6CA0P3dCLpszv7WpYnC_gqREg1pUXjhYXDR6I71RBQYKNlrsfiYrcB95GUi3eW9KUqnY_jQei',
                     'Content-Type: application/x-www-form-urlencoded',
