@@ -636,7 +636,7 @@ class AuthController extends Controller
     protected function getClientSecret($teamId, int $iat, int $exp, string $aud, $sub, $keyId)
     {
         $keyContent = file_get_contents(base_path() . '/AuthKey_SignIn.p8');
-        \Firebase\JWT\JWT::$leeway = 5;
+        \Firebase\JWT\JWT::$leeway = 60;
         return JWT::encode([
             'iss' => $teamId,
             'iat' => $iat,
