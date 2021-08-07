@@ -649,6 +649,35 @@ class AuthController extends Controller
     protected function callApple($code, $client_secret)
     {
         try {
+
+            $data = [
+                'client_id' => env('APPLE_IOS_SERVICE_ID'),
+                'client_secret' => $client_secret,
+                'code' => $code,
+                'grant_type' => 'authorization_code',
+                'redirect_uri' => 'https%3A%2F%2F4a1a558b3ff6.ngrok.io%2Fapi%2Flogin-with-apple'
+            ];
+
+            $ch = curl_init();
+            curl_setopt_array ($ch, [
+                CURLOPT_URL => 'https://appleid.apple.com/auth/token',
+                CURLOPT_POSTFIELDS => http_build_query($data),
+                CURLOPT_RETURNTRANSFER => true
+            ]);
+            $response = curl_exec($ch);
+            curl_close ($ch);
+
+            return json_decode($response, true);
+        } catch (\Exception $exception) {
+            Log::info('======== Error Login With Apple ========');
+            Log::info(json_encode($exception->getMessage()));
+            Log::info('======== Error Login With Apple ========');
+        }
+    }
+
+    protected function callApple2($code, $client_secret)
+    {
+        try {
             $curl = curl_init();
 
             curl_setopt_array($curl, array(
