@@ -413,9 +413,9 @@ class AuthController extends Controller
             Log::info(json_encode($payload));
             Log::info('========$payload========');
             if ($payload) {
-                $name = $payload['name'];
-                $email = $payload['email'];
-                $image = $payload['picture'];
+                $name = isset($payload['name']) ? $payload['name'] : null;
+                $email = isset($payload['name']) ? $payload['email'] : null;
+                $image = isset($payload['name']) ? $payload['picture'] : null;
 
                 $user = User::where('email', $email)->first();
                 if (!$user) {
@@ -487,7 +487,7 @@ class AuthController extends Controller
                 ]);
             } else {
                 return response()->json([
-                    'success' => false,
+                    'success' => false
                 ]);
             }
         } catch (\Exception $e) {
@@ -652,8 +652,6 @@ class AuthController extends Controller
 
     protected function callApple($code, $client_secret)
     {
-
-
         try {
             $curl = curl_init();
 
