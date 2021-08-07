@@ -75,12 +75,12 @@ class AuthController extends Controller
 
         $fcmToken = $request->header('Fcm-Token');
         $device = Device::updateOrCreate([
+            'uuid' => $request->uuid,
+            'user_id'     => $user->id
+        ],[
             'user_id'     => $user->id,
             'uuid' => $request->uuid,
             'token'   => $fcmToken
-        ],[
-            'user_id'     => $user->id,
-            'uuid' => $request->uuid
         ]);
 
         $response = response()->json([
@@ -124,10 +124,12 @@ class AuthController extends Controller
 
         $fcmToken = $request->header('Fcm-Token');
         $device = Device::updateOrCreate([
-            'token'   => $fcmToken,
+            'uuid' => $request->uuid,
+            'user_id'     => $user->id
         ],[
             'user_id'     => $user->id,
-            'uuid' => $request->uuid
+            'uuid' => $request->uuid,
+            'token'   => $fcmToken
         ]);
 
         $user->player->positions;
@@ -157,9 +159,6 @@ class AuthController extends Controller
     {
 
         $user = $request->user();
-        if (!$user) {
-            $user = User::find($request->user_id);
-        }
 
         if (!$user) {
             return response()->json([
@@ -167,11 +166,8 @@ class AuthController extends Controller
                 'message' => 'Successfully logged out'
             ]);
         }
-        $user->tokens()->delete();
 
-        $headerToken = explode(' ', $request->header('authorization'))[1];
-        $token = $user->tokens()->where('token', $headerToken)->first();
-        if ($token) $token->delete();
+        $user->currentAccessToken()->delete();
 
         $device = $user->devices->where('uuid', $request->uuid)->first();
         $device->update(['token' => null]);
@@ -443,12 +439,12 @@ class AuthController extends Controller
 
                     $fcmToken = $request->header('Fcm-Token');
                     $device = Device::updateOrCreate([
+                        'uuid' => $request->uuid,
+                        'user_id'     => $user->id
+                    ],[
                         'user_id'     => $user->id,
                         'uuid' => $request->uuid,
                         'token'   => $fcmToken
-                    ],[
-                        'user_id'     => $user->id,
-                        'uuid' => $request->uuid
                     ]);
 
                     $user->player->positions;
@@ -467,12 +463,12 @@ class AuthController extends Controller
 
                 $fcmToken = $request->header('Fcm-Token');
                 $device = Device::updateOrCreate([
+                    'uuid' => $request->uuid,
+                    'user_id'     => $user->id
+                ],[
                     'user_id'     => $user->id,
                     'uuid' => $request->uuid,
                     'token'   => $fcmToken
-                ],[
-                    'user_id'     => $user->id,
-                    'uuid' => $request->uuid
                 ]);
 
                 $user->player->positions;
@@ -575,12 +571,12 @@ class AuthController extends Controller
 
                     $fcmToken = $request->header('Fcm-Token');
                     $device = Device::updateOrCreate([
+                        'uuid' => $request->uuid,
+                        'user_id'     => $user->id
+                    ],[
                         'user_id'     => $user->id,
                         'uuid' => $request->uuid,
                         'token'   => $fcmToken
-                    ],[
-                        'user_id'     => $user->id,
-                        'uuid' => $request->uuid
                     ]);
 
                     $user->player->positions;
@@ -604,12 +600,12 @@ class AuthController extends Controller
 
                 $fcmToken = $request->header('Fcm-Token');
                 $device = Device::updateOrCreate([
+                    'uuid' => $request->uuid,
+                    'user_id'     => $user->id
+                ],[
                     'user_id'     => $user->id,
                     'uuid' => $request->uuid,
                     'token'   => $fcmToken
-                ],[
-                    'user_id'     => $user->id,
-                    'uuid' => $request->uuid
                 ]);
 
                 $user->player->positions;

@@ -30,7 +30,7 @@ Route::post('/login-with-google', [AuthController::class, 'loginWithGoogle']);
 Route::post('/login-with-apple', [AuthController::class, 'loginWithApple']);
 Route::post('/me', [AuthController::class, 'me'])->middleware('auth:sanctum');
 Route::post('/existEmail',[AuthController::class, 'existEmail']);
-Route::post('/logout',[AuthController::class, 'logout']);
+Route::post('/logout',[AuthController::class, 'logout'])->middleware('auth:sanctum');
 Route::post('/complete-user-profile',[AuthController::class, 'completeUserProfile'])->middleware('auth:sanctum');
 //Auth
 
