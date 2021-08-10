@@ -637,6 +637,15 @@ class AuthController extends Controller
     {
         $keyContent = file_get_contents(base_path() . '/AuthKey_SignIn.p8');
         \Firebase\JWT\JWT::$leeway = 60;
+        Log::info('===== getClientSecret data =====');
+        Log::info(json_encode([
+            'iss' => $teamId,
+            'iat' => $iat,
+            'exp' => $exp,
+            'aud' => $aud,
+            'sub' => $sub,
+        ]));
+        Log::info('===== getClientSecret data =====');
         return JWT::encode([
             'iss' => $teamId,
             'iat' => $iat,
@@ -646,7 +655,7 @@ class AuthController extends Controller
         ], $keyContent, 'ES256', $keyId);
     }
 
-    protected function callAppleTest($code, $client_secret)
+    protected function callApple($code, $client_secret)
     {
         try {
 
@@ -657,12 +666,18 @@ class AuthController extends Controller
                 'grant_type' => 'authorization_code',
                 'redirect_uri' => 'https://fulbito.app/api/login-with-apple'
             ];
+            Log::info('===== callApple data =====');
+            Log::info(json_encode($data));
+            Log::info('===== callApple data =====');
 
             $ch = curl_init();
             curl_setopt_array ($ch, [
                 CURLOPT_URL => 'https://appleid.apple.com/auth/token',
                 CURLOPT_POSTFIELDS => http_build_query($data),
-                CURLOPT_RETURNTRANSFER => true
+                CURLOPT_RETURNTRANSFER => true,
+                CURLOPT_HTTPHEADER => array(
+                    'Content-Type: application/x-www-form-urlencoded'
+                )
             ]);
             $response = curl_exec($ch);
             curl_close ($ch);
@@ -675,7 +690,7 @@ class AuthController extends Controller
         }
     }
 
-    protected function callApple($code, $client_secret)
+    protected function callApple2($code, $client_secret)
     {
         try {
             $curl = curl_init();
