@@ -510,18 +510,10 @@ class MatchController extends Controller
             return $match->when_play;
         });
 
-        if ($request->when_play) {
-            $whenPlay = Carbon::parse($request->when_play)->toDateTimeString();
-            $whenPlay = Carbon::createFromFormat('Y-m-d H:i:s', $whenPlay);
-            $matches = $matches->filter(function ($match) use ($whenPlay) {
-                return $match->when_play > $whenPlay;
-            })->take(10);
-        } else {
-            $today = Carbon::now();
-            $matches = $matches->filter(function ($match) use ($today) {
-                return $match->when_play > $today->toDateTimeString();
-            })->take(10);
-        }
+        $today = Carbon::now();
+        $matches = $matches->filter(function ($match) use ($today) {
+            return $match->when_play > $today->toDateTimeString();
+        });
 
         return response()->json([
             'success' => true,
@@ -841,6 +833,11 @@ class MatchController extends Controller
         });
 
         $matches = $this->returnAllMatches($request);
+        $today = Carbon::now();
+        $matches = $matches->filter(function ($match) use ($today) {
+            return $match->when_play > $today->toDateTimeString();
+        });
+        $matches = $matches->where('is_closed', false);
 
         return response()->json([
             'success' => true,
@@ -904,6 +901,11 @@ class MatchController extends Controller
         $match->delete();
 
         $matches = $this->returnAllMatches($request);
+        $today = Carbon::now();
+        $matches = $matches->filter(function ($match) use ($today) {
+            return $match->when_play > $today->toDateTimeString();
+        });
+        $matches = $matches->where('is_closed', false);
 
         return response()->json([
             'success' => true,
