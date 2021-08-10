@@ -1,4 +1,5 @@
 <?php
+dd(env('APPLE_IOS_SERVICE_ID'));
 ?>
 <!--
 THEME: Small Apps | Bootstrap App Landing Template

@@ -13,10 +13,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
-use Illuminate\Testing\Fluent\Concerns\Has;
 use Illuminate\Validation\ValidationException;
-use Intervention\Image\Facades\Image;
-use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Firebase\JWT\JWK;
 use Firebase\JWT\JWT;
 
@@ -90,6 +87,10 @@ class AuthController extends Controller
             'fcm_token' => $device->token,
             'token_type' => 'Bearer'
         ]);
+
+        Log::info('====== $response ========');
+        Log::info(json_encode($response));
+        Log::info('====== $response ========');
 
         return $response;
     }
@@ -260,19 +261,9 @@ class AuthController extends Controller
                 'message' => $validation['message']
             ]);
         }
-        // $userPositions = $validation['userPositions'];
         // $daysAvailables = $validation['daysAvailables'];
         $userLocationDetails = $validation['userLocationDetails'];
         $user = User::find($request->user_id);
-
-//        $saveUserPositionsResponse = $this->saveUserPositions($userPositions, $user);
-//        if (!$saveUserPositionsResponse['success']) {
-//            return response()->json([
-//                'success' => $saveUserPositionsResponse['success'],
-//                'message' => $saveUserPositionsResponse['message'],
-//                'error' => $saveUserPositionsResponse['error']
-//            ]);
-//        }
 
         $saveUserLocationResponse = $this->saveUserLocation($user, $userLocationDetails);
         if (!$saveUserLocationResponse['success']) {
@@ -309,11 +300,17 @@ class AuthController extends Controller
 
         $user->player->location;
 
-        return response()->json([
+        $response = response()->json([
             'success' => true,
             'user' => $user,
             'message' => 'User fully setted'
         ]);
+
+        Log::info('====== $response ========');
+        Log::info(json_encode($response));
+        Log::info('====== $response ========');
+
+        return $response;
 
     }
 
