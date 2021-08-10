@@ -573,7 +573,7 @@ FACEBOOK: https://www.facebook.com/themefisher
         if (platform === 'iOS') {
             downloadButton.setAttribute('href', '#iosUrl');
         }else if (platform === 'Android') {
-            downloadButton.setAttribute('href', '#androidUrl');
+            downloadButton.setAttribute('href', 'https://play.google.com/store/apps/details?id=com.crissavino.fulbito.fulbito_ap');
         } else {
             downloadButton.setAttribute('href', '#');
         }
