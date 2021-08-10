@@ -691,8 +691,8 @@ class AuthController extends Controller
                 CURLOPT_CUSTOMREQUEST => 'POST',
                 CURLOPT_POSTFIELDS => 'grant_type=authorization_code&code='.$code.'&redirect_uri=https%3A%2F%2Ffulbito.app%2Fapi%2Flogin-with-apple&client_id='.env('APPLE_IOS_SERVICE_ID').'&client_secret='.$client_secret,
                 CURLOPT_HTTPHEADER => array(
-                    'Content-Type: application/x-www-form-urlencoded',
-                ),
+                    'Content-Type: application/x-www-form-urlencoded'
+                )
             ));
 
             $response = curl_exec($curl);
@@ -724,9 +724,8 @@ class AuthController extends Controller
                 CURLOPT_CUSTOMREQUEST => 'POST',
                 CURLOPT_POSTFIELDS => 'grant_type=refresh_token&client_id='.env('APPLE_IOS_SERVICE_ID').'&client_secret='.$client_secret.'&refresh_token='.$refresh_token,
                 CURLOPT_HTTPHEADER => array(
-                    'Fcm-Token: f09Jwl2WSaumuWIv9coWJp:APA91bHuHy8gK_LIvYbP_lprEmU6_6CA0P3dCLpszv7WpYnC_gqREg1pUXjhYXDR6I71RBQYKNlrsfiYrcB95GUi3eW9KUqnY_jQei',
-                    'Content-Type: application/x-www-form-urlencoded',
-                ),
+                    'Content-Type: application/x-www-form-urlencoded'
+                )
             ));
 
             $response = curl_exec($curl);
@@ -734,7 +733,9 @@ class AuthController extends Controller
             curl_close($curl);
             return json_decode($response, true);
         } catch (\Exception $exception) {
-            dd($exception->getMessage());
+            Log::info('======= callAppleRefreshToken ========');
+            Log::info($exception->getMessage());
+            Log::info('======= callAppleRefreshToken ========');
         }
     }
 
