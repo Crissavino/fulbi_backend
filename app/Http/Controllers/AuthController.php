@@ -91,7 +91,6 @@ class AuthController extends Controller
         Log::info('====== $response ========');
         Log::info(json_encode($response));
         Log::info('====== $response ========');
-
         return $response;
     }
 
