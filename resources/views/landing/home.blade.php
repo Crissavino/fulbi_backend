@@ -84,7 +84,7 @@ FACEBOOK: https://www.facebook.com/themefisher
             <div class="col-md-6 order-2 order-md-1 text-center text-md-left">
                 <h1 class="text-white font-weight-bold mb-4">Fulbito App</h1>
                 <p class="text-white mb-5">{!! __('landing.matches-all-one-place') !!}</p>
-                <a href="#android" id="downloadButton" class="btn btn-main-md">{!! __('landing.download') !!}</a>
+                <a href="" id="downloadButton" class="btn btn-main-md">{!! __('landing.download') !!}</a>
             </div>
             <div class="col-md-6 text-center order-1 order-md-2">
                 <img id="headerImage" class="img-fluid" src="{{asset('landing/images/mobile-2.png')}}" alt="screenshot" style="max-width: 70% !important;">
@@ -579,7 +579,12 @@ FACEBOOK: https://www.facebook.com/themefisher
         }else if (platform === 'Android') {
             downloadButton.setAttribute('href', androidLink);
         } else {
-            downloadButton.setAttribute('href', '#downloadAppButtons');
+            $('#downloadButton').on('click', function () {
+                $("html, body").animate({
+                    scrollTop: $('#downloadAppButtons').offset().top
+                }, 1000);
+                return false;
+            });
         }
         downloadButtonAndroid.setAttribute('href', androidLink);
         downloadButtonIOS.setAttribute('href', iosLink);
