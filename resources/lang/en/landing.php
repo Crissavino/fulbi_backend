@@ -27,7 +27,7 @@ return [
     'match-participants-desc' => 'You can simply see which players are participating. Do you know any of them?',
     'match-chat' => 'Match chat',
     'match-chat-desc' => 'We create a chat within each match because it is always good to have it not only to organize who carries the ball but also to rush late players!',
-    'time-to-play' => "It's time to play some good football, <b>what are you waiting for?</b>",
+    'time-to-play' => "It's time to play a good match, <b>what are you waiting for?</b>",
     'iphone' => 'iPhone',
     'android' => 'Android',
 ];

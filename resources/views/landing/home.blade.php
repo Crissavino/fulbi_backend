@@ -401,19 +401,19 @@ FACEBOOK: https://www.facebook.com/themefisher
 <!--====  End of Testimonial  ====-->
 
 <section class="call-to-action-app section bg-green-gradient">
-    <div class="container-fluid">
+    <div class="container-fluid" id="downloadAppButtons">
         <div class="row">
             <div class="col-lg-12">
                 <h2 class="mb-5">{!! __('landing.time-to-play') !!}</b></h2>
                 <ul class="list-inline">
                     <li class="list-inline-item">
-                        <a href="" class="btn btn-rounded-icon">
+                        <a href="" id="downloadButtonIOS" class="btn btn-rounded-icon">
                             <i class="ti-apple"></i>
                             {!! __('landing.iphone') !!}
                         </a>
                     </li>
                     <li class="list-inline-item">
-                        <a href="" class="btn btn-rounded-icon">
+                        <a href="" id="downloadButtonAndroid" class="btn btn-rounded-icon">
                             <i class="ti-android"></i>
                             {!! __('landing.android') !!}
                         </a>
@@ -570,13 +570,20 @@ FACEBOOK: https://www.facebook.com/themefisher
         const platform = getMobileOperatingSystem();
 
         let downloadButton = document.getElementById('downloadButton');
+        let downloadButtonAndroid = document.getElementById('downloadButtonAndroid');
+        let downloadButtonIOS = document.getElementById('downloadButtonIOS');
+        const androidLink = 'https://play.google.com/store/apps/details?id=com.crissavino.fulbito.fulbito_app';
+        const iosLink = '#iosLink';
         if (platform === 'iOS') {
-            downloadButton.setAttribute('href', '#iosUrl');
+            downloadButton.setAttribute('href', iosLink);
         }else if (platform === 'Android') {
-            downloadButton.setAttribute('href', 'https://play.google.com/store/apps/details?id=com.crissavino.fulbito.fulbito_ap');
+            downloadButton.setAttribute('href', androidLink);
         } else {
-            downloadButton.setAttribute('href', '#');
+            downloadButton.setAttribute('href', '#downloadAppButtons');
         }
+        downloadButtonAndroid.setAttribute('href', androidLink);
+        downloadButtonIOS.setAttribute('href', iosLink);
+
     }
 </script>
 </body>
