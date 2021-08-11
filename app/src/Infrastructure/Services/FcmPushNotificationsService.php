@@ -51,6 +51,7 @@ class FcmPushNotificationsService
                     'notification' => [
                         "title" => $notificationTitle,
                         "body" => $notificationBody,
+                        "sound" => "default"
                     ],
                     "priority" => "high",
                     "data" => $data,
@@ -61,7 +62,7 @@ class FcmPushNotificationsService
 
             $body = $response->getBody();
             $bodyContent = $body->getContents();
-            Log::info("BODY ============");
+            Log::info("BODY sendChatTextMessage ============");
             Log::info(json_encode($body));
             Log::info("============ BODY");
             Log::info("BODY CONTENT ============");
@@ -90,7 +91,7 @@ class FcmPushNotificationsService
                 'json' => [
                     'notification' => [
                         "title" => $notificationTitle,
-                        // "body" => $notificationBody,
+                        "sound" => "default"
                     ],
                     "priority" => "high",
                     "data" => $data,
@@ -100,7 +101,7 @@ class FcmPushNotificationsService
 
             $body = $response->getBody();
             $bodyContent = $body->getContents();
-            Log::info("BODY ============");
+            Log::info("BODY sendMatchInvitation ============");
             Log::info(json_encode($body));
             Log::info("============ BODY");
             Log::info("BODY CONTENT ============");
@@ -129,7 +130,7 @@ class FcmPushNotificationsService
                 'json' => [
                     'notification' => [
                         "title" => $notificationTitle,
-                        // "body" => $notificationBody,
+                        "sound" => "default"
                     ],
                     "priority" => "high",
                     "data" => $data,
@@ -139,7 +140,7 @@ class FcmPushNotificationsService
 
             $body = $response->getBody();
             $bodyContent = $body->getContents();
-            Log::info("BODY ============");
+            Log::info("BODY sendRejectMatchInvitation ============");
             Log::info(json_encode($body));
             Log::info("============ BODY");
             Log::info("BODY CONTENT ============");
@@ -168,7 +169,7 @@ class FcmPushNotificationsService
                 'json' => [
                     'notification' => [
                         "title" => $notificationTitle,
-                        // "body" => $notificationBody,
+                        "sound" => "default"
                     ],
                     "priority" => "high",
                     "data" => $data,
@@ -178,7 +179,7 @@ class FcmPushNotificationsService
 
             $body = $response->getBody();
             $bodyContent = $body->getContents();
-            Log::info("BODY ============");
+            Log::info("BODY sendJoinedToMatch ============");
             Log::info(json_encode($body));
             Log::info("============ BODY");
             Log::info("BODY CONTENT ============");
@@ -207,7 +208,7 @@ class FcmPushNotificationsService
                 'json' => [
                     'notification' => [
                         "title" => $notificationTitle,
-                        // "body" => $notificationBody,
+                        "sound" => "default"
                     ],
                     "priority" => "high",
                     "data" => $data,
@@ -217,7 +218,7 @@ class FcmPushNotificationsService
 
             $body = $response->getBody();
             $bodyContent = $body->getContents();
-            Log::info("BODY ============");
+            Log::info("BODY sendLeftMatch ============");
             Log::info(json_encode($body));
             Log::info("============ BODY");
             Log::info("BODY CONTENT ============");
@@ -246,6 +247,7 @@ class FcmPushNotificationsService
                 'json' => [
                     'notification' => [
                         "title" => $notificationTitle,
+                        "sound" => "default"
                         // "body" => $notificationBody,
                     ],
                     "priority" => "high",
@@ -256,7 +258,7 @@ class FcmPushNotificationsService
 
             $body = $response->getBody();
             $bodyContent = $body->getContents();
-            Log::info("BODY ============");
+            Log::info("BODY sendMatchCreated ============");
             Log::info(json_encode($body));
             Log::info("============ BODY");
             Log::info("BODY CONTENT ============");
@@ -285,7 +287,7 @@ class FcmPushNotificationsService
                 'json' => [
                     'notification' => [
                         "title" => $notificationTitle,
-                        // "body" => $notificationBody,
+                        "sound" => "default"
                     ],
                     "priority" => "high",
                     "data" => $data,
@@ -295,7 +297,7 @@ class FcmPushNotificationsService
 
             $body = $response->getBody();
             $bodyContent = $body->getContents();
-            Log::info("BODY ============");
+            Log::info("BODY sendMatchEdited ============");
             Log::info(json_encode($body));
             Log::info("============ BODY");
             Log::info("BODY CONTENT ============");
@@ -335,7 +337,7 @@ class FcmPushNotificationsService
 
             $body = $response->getBody();
             $bodyContent = $body->getContents();
-            Log::info("BODY ============");
+            Log::info("BODY sendSilence ============");
             Log::info(json_encode($body));
             Log::info("============ BODY");
             Log::info("BODY CONTENT ============");
