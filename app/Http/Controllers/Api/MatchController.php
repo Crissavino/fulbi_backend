@@ -114,6 +114,14 @@ class MatchController extends Controller
                     [],
                     $userDevicesTokens
                 );
+
+                FcmPushNotificationsService::sendSilence(
+                    'silence_match_created',
+                    [
+                        'match_id' => $match->id
+                    ],
+                    $userDevicesTokens
+                );
             }
         });
 
