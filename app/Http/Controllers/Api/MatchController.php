@@ -356,24 +356,20 @@ class MatchController extends Controller
         }
 
         $isFreeMatch = boolval($request->is_free_match);
-        $currencyId = null;
-        $cost = null;
-        if(!$isFreeMatch) {
-            $currencyId = floatval($request->currency_id);
-            if (!$currencyId) {
-                return [
-                    'success' => false,
-                    'message' => __('errors.missingParameter')
-                ];
-            }
+        $currencyId = floatval($request->currency_id);
+        if (!$currencyId) {
+            return [
+                'success' => false,
+                'message' => __('errors.missingParameter')
+            ];
+        }
 
-            $cost = doubleval($request->cost);
-            if (!$cost) {
-                return [
-                    'success' => false,
-                    'message' => __('errors.missingParameter')
-                ];
-            }
+        $cost = doubleval($request->cost);
+        if (!$cost && !$isFreeMatch) {
+            return [
+                'success' => false,
+                'message' => __('errors.missingParameter')
+            ];
         }
 
         $numPlayers = intval($request->num_players);
