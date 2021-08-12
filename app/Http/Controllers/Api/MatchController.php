@@ -162,7 +162,7 @@ class MatchController extends Controller
         }
 
         $cost = doubleval($request->cost);
-        if (!$cost) {
+        if (!$cost && !$isFreeMatch) {
             return [
                 'success' => false,
                 'message' => __('errors.missingParameter')
