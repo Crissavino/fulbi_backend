@@ -106,7 +106,7 @@ class MatchController extends Controller
             ->get();
 
         $players = Player::where('id', '<>', $user->player->id)->whereIn('location_id', $locations->pluck('id'))->with(['user'])->get();
-        $players->map(function ($player) use ($request, $user){
+        $players->map(function ($player) use ($request, $user, $match){
             $userDevicesTokens = $player->user->devices->pluck('token')->toArray();
             if(!empty($userDevicesTokens)) {
                 FcmPushNotificationsService::sendMatchCreated(
