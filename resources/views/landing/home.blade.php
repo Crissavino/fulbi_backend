@@ -428,95 +428,46 @@ FACEBOOK: https://www.facebook.com/themefisher
 =            Footer            =
 =============================-->
 <footer>
-{{--    <div class="footer-main">--}}
-{{--        <div class="container">--}}
-{{--            <div class="row">--}}
-{{--                <div class="col-lg-4 col-md-12 m-md-auto align-self-center">--}}
-{{--                    <div class="block">--}}
-{{--                        <a href="index.html"><img src="landing/images/logo-alt.png" alt="footer-logo"></a>--}}
-{{--                        <!-- Social Site Icons -->--}}
-{{--                        <ul class="social-icon list-inline">--}}
-{{--                            <li class="list-inline-item">--}}
-{{--                                <a href="https://www.facebook.com/themefisher"><i class="ti-facebook"></i></a>--}}
-{{--                            </li>--}}
-{{--                            <li class="list-inline-item">--}}
-{{--                                <a href="https://twitter.com/themefisher"><i class="ti-twitter"></i></a>--}}
-{{--                            </li>--}}
-{{--                            <li class="list-inline-item">--}}
-{{--                                <a href="https://www.instagram.com/themefisher/"><i class="ti-instagram"></i></a>--}}
-{{--                            </li>--}}
-{{--                        </ul>--}}
-{{--                    </div>--}}
-{{--                </div>--}}
-{{--                <div class="col-lg-2 col-md-3 col-6 mt-5 mt-lg-0">--}}
-{{--                    <div class="block-2">--}}
-{{--                        <!-- heading -->--}}
-{{--                        <h6>Product</h6>--}}
-{{--                        <!-- links -->--}}
-{{--                        <ul>--}}
-{{--                            <li><a href="team.html">Teams</a></li>--}}
-{{--                            <li><a href="blog.html">Blogs</a></li>--}}
-{{--                            <li><a href="FAQ.html">FAQs</a></li>--}}
-{{--                        </ul>--}}
-{{--                    </div>--}}
-{{--                </div>--}}
-{{--                <div class="col-lg-2 col-md-3 col-6 mt-5 mt-lg-0">--}}
-{{--                    <div class="block-2">--}}
-{{--                        <!-- heading -->--}}
-{{--                        <h6>Resources</h6>--}}
-{{--                        <!-- links -->--}}
-{{--                        <ul>--}}
-{{--                            <li><a href="sign-up.html">Singup</a></li>--}}
-{{--                            <li><a href="sign-in.html">Login</a></li>--}}
-{{--                            <li><a href="blog.html">Blog</a></li>--}}
-{{--                        </ul>--}}
-{{--                    </div>--}}
-{{--                </div>--}}
-{{--                <div class="col-lg-2 col-md-3 col-6 mt-5 mt-lg-0">--}}
-{{--                    <div class="block-2">--}}
-{{--                        <!-- heading -->--}}
+    <div class="footer-main">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-12 m-md-auto align-self-center text-center">
+                    <div class="d-block mb-3">
+                        <a href="{{route('home')}}">
+                            <img src="{{asset('/landing/images/footer_logo.png')}}" alt="footer-logo" width="100" style="margin-left: 20px;">
+                        </a>
+                    </div>
+                </div>
+                <div class="col-lg-2 col-md-3 col-6 mt-5 mt-lg-0 m-auto">
+                    <div class="block-2">
+                        <!-- heading -->
 {{--                        <h6>Company</h6>--}}
-{{--                        <!-- links -->--}}
-{{--                        <ul>--}}
-{{--                            <li><a href="career.html">Career</a></li>--}}
-{{--                            <li><a href="contact.html">Contact</a></li>--}}
-{{--                            <li><a href="team.html">Investor</a></li>--}}
-{{--                            <li><a href="privacy.html">Terms</a></li>--}}
-{{--                        </ul>--}}
-{{--                    </div>--}}
-{{--                </div>--}}
-{{--                <div class="col-lg-2 col-md-3 col-6 mt-5 mt-lg-0">--}}
-{{--                    <div class="block-2">--}}
-{{--                        <!-- heading -->--}}
-{{--                        <h6>Company</h6>--}}
-{{--                        <!-- links -->--}}
-{{--                        <ul>--}}
-{{--                            <li><a href="about.html">About</a></li>--}}
-{{--                            <li><a href="contact.html">Contact</a></li>--}}
-{{--                            <li><a href="team.html">Team</a></li>--}}
-{{--                            <li><a href="privacy-policy.html">Privacy Policy</a></li>--}}
-{{--                        </ul>--}}
-{{--                    </div>--}}
-{{--                </div>--}}
-{{--            </div>--}}
-{{--        </div>--}}
-{{--    </div>--}}
-    <div class="text-center bg-dark py-4">
-        <div id="selectLang">
-            <form
-                action="@if(request()->path() === '/') {{route('changeLang')}} @elseif(request()->path() === 'home') {{route('changeLangHome')}} @else {{route('changeLang')}} @endif"
-                method="POST" id="changeLang">
-                @csrf
-                <select id="selectLangSelect" class="btn btn-rounded-icon" name="lang" style="width: 200px">
-                    <option @if(Illuminate\Support\Facades\App::getLocale() === 'en') selected @endif value="en">English</option>
-                    <option @if(Illuminate\Support\Facades\App::getLocale() === 'es') selected @endif value="es">Español</option>
-                </select>
-            </form>
+                        <!-- links -->
+                        <ul style="display: flex; flex-direction: row">
+                            <li class="m-3"><a href="{{route('terms')}}">Terms & Condition</a></li>
+                            <li class="m-3"><a href="{{route('privacy')}}">Privacy Policy</a></li>
+                        </ul>
+                    </div>
+
+                    <div id="selectLang">
+                        <form
+                            action="@if(request()->path() === '/') {{route('changeLang')}} @elseif(request()->path() === 'home') {{route('changeLangHome')}} @else {{route('changeLang')}} @endif"
+                            method="POST" id="changeLang">
+                            @csrf
+                            <select id="selectLangSelect" class="btn btn-rounded-icon" name="lang" style="width: 200px">
+                                <option @if(Illuminate\Support\Facades\App::getLocale() === 'en') selected @endif value="en">English</option>
+                                <option @if(Illuminate\Support\Facades\App::getLocale() === 'es') selected @endif value="es">Español</option>
+                            </select>
+                        </form>
+                    </div>
+                </div>
+            </div>
         </div>
+    </div>
+    <div class="text-center bg-dark py-4">
         <small class="text-secondary">Copyright &copy; <script>document.write(new Date().getFullYear())</script>. Designed &amp; Developed by jackCode</small>
     </div>
 </footer>
-
 
 <!-- To Top -->
 <div class="scroll-top-to">

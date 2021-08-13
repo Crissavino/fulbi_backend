@@ -32,6 +32,10 @@ Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::post('/', [HomeController::class, 'changeLang'])->name('changeLang');
 Route::get('/home', [HomeController::class, 'index'])->name('home');
 Route::post('/home', [HomeController::class, 'changeLang'])->name('changeLangHome');
+Route::get('/terms', [HomeController::class, 'terms'])->name('terms');
+Route::post('/terms', [HomeController::class, 'changeLangTerms'])->name('changeLangTerms');
+Route::get('/privacy', [HomeController::class, 'privacy'])->name('privacy');
+Route::post('/privacy', [HomeController::class, 'changeLangPrivacy'])->name('changeLangPrivacy');
 
 Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 

@@ -234,6 +234,7 @@ class UserController extends Controller
         } else {
             return response()->json([
                 'success' => false,
+                'messageKey' => 'errors.auth.nicknameTaken'
             ]);
         }
 
