@@ -67,6 +67,10 @@ Route::post('/user/update-profile-picture',[UserController::class, 'updateProfil
 Route::post('/user/send-recovery-password-email',[AuthController::class, 'sendRecoveryPasswordEmail']);
 //User
 
+//App
+Route::get('/app/minimum-version',[UserController::class, 'getAppMinimumVersion']);
+//App
+
 //Notifications
 Route::post('/notifications/send',[NotificationsController::class, 'sendNotification']);
 //Notifications

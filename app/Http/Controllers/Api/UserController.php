@@ -296,4 +296,14 @@ class UserController extends Controller
         }
     }
 
+    public function getAppMinimumVersion()
+    {
+        return response()->json([
+            'success' => true,
+            'versionMajor' => 1,
+            'versionMinor' => 1,
+            'versionPatch' => 20,
+        ]);
+    }
+
 }
