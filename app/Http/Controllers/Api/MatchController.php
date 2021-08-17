@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Currency;
+use App\Models\Device;
 use App\Models\Genre;
 use App\Models\Location;
 use App\Models\Match;
@@ -20,6 +21,7 @@ use App\src\Infrastructure\Services\FcmPushNotificationsService;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
@@ -28,6 +30,7 @@ class MatchController extends Controller
     const DEFAULT_MATCH_RANGE = 20;
     const MIX_GENRE_ID = 3;
     const MAX_FREE_MATCHES = 5;
+    const MAX_FREE_MATCHES_BY_WEEK = 3;
 
     public function store(Request $request)
     {
@@ -47,13 +50,25 @@ class MatchController extends Controller
         $num_players = $parameters['num_players'];
         $locationData = $parameters['locationData'];
         $user = $parameters['user'];
-        if ($user->created_matches >= self::MAX_FREE_MATCHES) {
-            return [
-                'success' => false,
-                'max_free_matches_reached' => true,
-                'message' => __('errors.maxMatchesReached')
-            ];
+        if (!$user->premium) {
+            if ($user->created_matches >= self::MAX_FREE_MATCHES) {
+                return [
+                    'success' => false,
+                    'max_free_matches_reached' => true,
+                    'message' => __('errors.maxMatchesReached')
+                ];
+            }
+
+            $matchesInThatWeek = $this->countMatchesThatWeek($user, $when_play);
+            if ($matchesInThatWeek > self::MAX_FREE_MATCHES_BY_WEEK) {
+                return [
+                    'success' => false,
+                    'max_free_matches_by_week_reached' => true,
+                    'message' => __('errors.maxMatchesByWeekReached')
+                ];
+            }
         }
+        $locationData = json_decode($locationData, true);
 
         $location = (new EloquentLocationService())->create(
             $locationData['lat'],
@@ -107,12 +122,28 @@ class MatchController extends Controller
 
         $players = Player::where('id', '<>', $user->player->id)->whereIn('location_id', $locations->pluck('id'))->with(['user'])->get();
         $players->map(function ($player) use ($request, $user, $match){
-            $userDevicesTokens = $player->user->devices->pluck('token')->toArray();
-            if(!empty($userDevicesTokens)) {
+            $userDevicesTokensEn = [];
+            $userDevicesTokensEs = [];
+            foreach ($player->user->devices as $device) {
+                if ($device->token) {
+                    if ($device->language === null) {
+                        $userDevicesTokensEn[] = $device->token;
+                    } elseif (str_contains($device->language, 'en')) {
+                        $userDevicesTokensEs[] = $device->token;
+                    } elseif (str_contains($device->language, 'es')) {
+                        $userDevicesTokensEs[] = $device->token;
+                    } else {
+                        $userDevicesTokensEn[] = $device->token;
+                    }
+                }
+            }
+
+            if(!empty($userDevicesTokensEn)) {
+                App::setLocale('en');
                 FcmPushNotificationsService::sendMatchCreated(
                     __('notifications.match.created'),
                     [],
-                    $userDevicesTokens
+                    $userDevicesTokensEn
                 );
 
                 FcmPushNotificationsService::sendSilence(
@@ -120,7 +151,24 @@ class MatchController extends Controller
                     [
                         'match_id' => $match->id
                     ],
-                    $userDevicesTokens
+                    $userDevicesTokensEn
+                );
+            }
+
+            if(!empty($userDevicesTokensEs)) {
+                App::setLocale('es');
+                FcmPushNotificationsService::sendMatchCreated(
+                    __('notifications.match.created'),
+                    [],
+                    $userDevicesTokensEs
+                );
+
+                FcmPushNotificationsService::sendSilence(
+                    'silence_match_created',
+                    [
+                        'match_id' => $match->id
+                    ],
+                    $userDevicesTokensEs
                 );
             }
         });
@@ -251,6 +299,17 @@ class MatchController extends Controller
             ];
         }
 
+        if (!$user->premium) {
+            $matchesInThatWeek = $this->countMatchesThatWeek($user, $when_play);
+            if ($matchesInThatWeek > self::MAX_FREE_MATCHES_BY_WEEK) {
+                return [
+                    'success' => false,
+                    'max_free_matches_by_week_reached' => true,
+                    'message' => __('errors.maxMatchesByWeekReached')
+                ];
+            }
+        }
+
         (new EloquentLocationService())->update(
             $match->location->id,
             $locationData['lat'],
@@ -283,8 +342,25 @@ class MatchController extends Controller
         $minutes = strlen((string)$whenPlay->minute) === 1 ? '0'.$whenPlay->minute : $whenPlay->minute;
         $otherPlayers = $match->players()->where('player_id', '<>', $user->player->id)->get();
         $otherPlayers->map(function ($player) use ($request, $user, $match, $day, $month, $hour, $minutes){
-            $userDevicesTokens = $player->user->devices->pluck('token')->toArray();
-            if(!empty($userDevicesTokens)) {
+
+            $userDevicesTokensEn = [];
+            $userDevicesTokensEs = [];
+            foreach ($player->user->devices as $device) {
+                if ($device->token) {
+                    if ($device->language === null) {
+                        $userDevicesTokensEn[] = $device->token;
+                    } elseif (str_contains($device->language, 'en')) {
+                        $userDevicesTokensEs[] = $device->token;
+                    } elseif (str_contains($device->language, 'es')) {
+                        $userDevicesTokensEs[] = $device->token;
+                    } else {
+                        $userDevicesTokensEn[] = $device->token;
+                    }
+                }
+            }
+
+            if(!empty($userDevicesTokensEn)) {
+                App::setLocale('en');
                 FcmPushNotificationsService::sendMatchEdited(
                     __('notifications.match.edited', [
                         'userName' => $user->name,
@@ -294,7 +370,7 @@ class MatchController extends Controller
                     [
                         'match_id' => $match->id
                     ],
-                    $userDevicesTokens
+                    $userDevicesTokensEn
                 );
 
                 FcmPushNotificationsService::sendSilence(
@@ -302,7 +378,30 @@ class MatchController extends Controller
                     [
                         'match_id' => $match->id
                     ],
-                    $userDevicesTokens
+                    $userDevicesTokensEn
+                );
+            }
+
+            if(!empty($userDevicesTokensEs)) {
+                App::setLocale('es');
+                FcmPushNotificationsService::sendMatchEdited(
+                    __('notifications.match.edited', [
+                        'userName' => $user->name,
+                        'day' => $day . '/' . $month,
+                        'hour' => $hour . ':' . $minutes
+                    ]),
+                    [
+                        'match_id' => $match->id
+                    ],
+                    $userDevicesTokensEs
+                );
+
+                FcmPushNotificationsService::sendSilence(
+                    'silence_match_edited',
+                    [
+                        'match_id' => $match->id
+                    ],
+                    $userDevicesTokensEs
                 );
             }
         });
@@ -537,25 +636,63 @@ class MatchController extends Controller
         $month = strlen((string)$whenPlay->month) === 1 ? '0'.$whenPlay->month : $whenPlay->month;
         $hour = strlen((string)$whenPlay->hour) === 1 ? '0'.$whenPlay->hour : $whenPlay->hour;
         $minutes = strlen((string)$whenPlay->minute) === 1 ? '0'.$whenPlay->minute : $whenPlay->minute;
-        $userDevicesTokens = $userToInvite->devices->pluck('token')->toArray();
 
-        FcmPushNotificationsService::sendMatchInvitation(
-            __('notifications.match.invited', [
-                'userName' => $userWhoInvite->name,
-                'day' => $day . '/' . $month,
-                'hour' => $hour . ':' . $minutes
-            ]),
-            [
-                'match_id' => $match->id
-            ],
-            $userDevicesTokens
-        );
+        $userDevicesTokensEn = [];
+        $userDevicesTokensEs = [];
+        foreach ($userToInvite->devices as $device) {
+            if ($device->token) {
+                if ($device->language === null) {
+                    $userDevicesTokensEn[] = $device->token;
+                } elseif (str_contains($device->language, 'en')) {
+                    $userDevicesTokensEs[] = $device->token;
+                } elseif (str_contains($device->language, 'es')) {
+                    $userDevicesTokensEs[] = $device->token;
+                } else {
+                    $userDevicesTokensEn[] = $device->token;
+                }
+            }
+        }
 
-        FcmPushNotificationsService::sendSilence(
-            'silence_invited_match',
-            [],
-            $userDevicesTokens
-        );
+        if (!empty($userDevicesTokensEn)) {
+            App::setLocale('en');
+            FcmPushNotificationsService::sendMatchInvitation(
+                __('notifications.match.invited', [
+                    'userName' => $userWhoInvite->name,
+                    'day' => $day . '/' . $month,
+                    'hour' => $hour . ':' . $minutes
+                ]),
+                [
+                    'match_id' => $match->id
+                ],
+                $userDevicesTokensEn
+            );
+
+            FcmPushNotificationsService::sendSilence(
+                'silence_invited_match',
+                [],
+                $userDevicesTokensEn
+            );
+        }
+        if (!empty($userDevicesTokensEs)) {
+            App::setLocale('es');
+            FcmPushNotificationsService::sendMatchInvitation(
+                __('notifications.match.invited', [
+                    'userName' => $userWhoInvite->name,
+                    'day' => $day . '/' . $month,
+                    'hour' => $hour . ':' . $minutes
+                ]),
+                [
+                    'match_id' => $match->id
+                ],
+                $userDevicesTokensEs
+            );
+
+            FcmPushNotificationsService::sendSilence(
+                'silence_invited_match',
+                [],
+                $userDevicesTokensEs
+            );
+        }
 
         $match->players()->syncWithoutDetaching($userToInvite->player->id);
 
@@ -580,25 +717,61 @@ class MatchController extends Controller
         $month = strlen((string)$whenPlay->month) === 1 ? '0'.$whenPlay->month : $whenPlay->month;
         $hour = strlen((string)$whenPlay->hour) === 1 ? '0'.$whenPlay->hour : $whenPlay->hour;
         $minutes = strlen((string)$whenPlay->minute) === 1 ? '0'.$whenPlay->minute : $whenPlay->minute;
-        $userDevicesTokens = $userToInvite->devices->pluck('token')->toArray();
+        $userDevicesTokensEn = [];
+        $userDevicesTokensEs = [];
+        foreach ($userToInvite->devices as $device) {
+            if ($device->token) {
+                if ($device->language === null) {
+                    $userDevicesTokensEn[] = $device->token;
+                } elseif (str_contains($device->language, 'en')) {
+                    $userDevicesTokensEs[] = $device->token;
+                } elseif (str_contains($device->language, 'es')) {
+                    $userDevicesTokensEs[] = $device->token;
+                } else {
+                    $userDevicesTokensEn[] = $device->token;
+                }
+            }
+        }
+        if (!empty($userDevicesTokensEn)) {
+            App::setLocale('en');
+            FcmPushNotificationsService::sendMatchInvitation(
+                __('notifications.match.invited', [
+                    'userName' => $userWhoInvite->name,
+                    'day' => $day . '/' . $month,
+                    'hour' => $hour . ':' . $minutes
+                ]),
+                [
+                    'match_id' => $match->id
+                ],
+                $userDevicesTokensEn
+            );
 
-        FcmPushNotificationsService::sendMatchInvitation(
-            __('notifications.match.invited', [
-                'userName' => $userWhoInvite->name,
-                'day' => $day . '/' . $month,
-                'hour' => $hour . ':' . $minutes
-            ]),
-            [
-                'match_id' => $match->id
-            ],
-            $userDevicesTokens
-        );
+            FcmPushNotificationsService::sendSilence(
+                'silence_invited_match',
+                [],
+                $userDevicesTokensEn
+            );
+        }
+        if (!empty($userDevicesTokensEs)) {
+            App::setLocale('es');
+            FcmPushNotificationsService::sendMatchInvitation(
+                __('notifications.match.invited', [
+                    'userName' => $userWhoInvite->name,
+                    'day' => $day . '/' . $month,
+                    'hour' => $hour . ':' . $minutes
+                ]),
+                [
+                    'match_id' => $match->id
+                ],
+                $userDevicesTokensEs
+            );
 
-        FcmPushNotificationsService::sendSilence(
-            'silence_invited_match',
-            [],
-            $userDevicesTokens
-        );
+            FcmPushNotificationsService::sendSilence(
+                'silence_invited_match',
+                [],
+                $userDevicesTokensEs
+            );
+        }
 
         $match->players()->syncWithoutDetaching($userToInvite->player->id);
 
@@ -623,25 +796,63 @@ class MatchController extends Controller
         $month = strlen((string)$whenPlay->month) === 1 ? '0'.$whenPlay->month : $whenPlay->month;
         $hour = strlen((string)$whenPlay->hour) === 1 ? '0'.$whenPlay->hour : $whenPlay->hour;
         $minutes = strlen((string)$whenPlay->minute) === 1 ? '0'.$whenPlay->minute : $whenPlay->minute;
-        $userDevicesTokens = $userToInvite->devices->pluck('token')->toArray();
 
-        FcmPushNotificationsService::sendMatchInvitation(
-            __('notifications.match.invited', [
-                'userName' => $userWhoInvite->name,
-                'day' => $day . '/' . $month,
-                'hour' => $hour . ':' . $minutes
-            ]),
-            [
-                'match_id' => $match->id
-            ],
-            $userDevicesTokens
-        );
+        $userDevicesTokensEn = [];
+        $userDevicesTokensEs = [];
+        foreach ($userToInvite->devices as $device) {
+            if ($device->token) {
+                if ($device->language === null) {
+                    $userDevicesTokensEn[] = $device->token;
+                } elseif (str_contains($device->language, 'en')) {
+                    $userDevicesTokensEs[] = $device->token;
+                } elseif (str_contains($device->language, 'es')) {
+                    $userDevicesTokensEs[] = $device->token;
+                } else {
+                    $userDevicesTokensEn[] = $device->token;
+                }
+            }
+        }
 
-        FcmPushNotificationsService::sendSilence(
-            'silence_invited_match',
-            [],
-            $userDevicesTokens
-        );
+        if (!empty($userDevicesTokensEn)) {
+            App::setLocale('en');
+            FcmPushNotificationsService::sendMatchInvitation(
+                __('notifications.match.invited', [
+                    'userName' => $userWhoInvite->name,
+                    'day' => $day . '/' . $month,
+                    'hour' => $hour . ':' . $minutes
+                ]),
+                [
+                    'match_id' => $match->id
+                ],
+                $userDevicesTokensEn
+            );
+
+            FcmPushNotificationsService::sendSilence(
+                'silence_invited_match',
+                [],
+                $userDevicesTokensEn
+            );
+        }
+        if (!empty($userDevicesTokensEs)) {
+            App::setLocale('es');
+            FcmPushNotificationsService::sendMatchInvitation(
+                __('notifications.match.invited', [
+                    'userName' => $userWhoInvite->name,
+                    'day' => $day . '/' . $month,
+                    'hour' => $hour . ':' . $minutes
+                ]),
+                [
+                    'match_id' => $match->id
+                ],
+                $userDevicesTokensEs
+            );
+
+            FcmPushNotificationsService::sendSilence(
+                'silence_invited_match',
+                [],
+                $userDevicesTokensEs
+            );
+        }
 
         $match->players()->syncWithoutDetaching($userToInvite->player->id);
         $match->players()->where('player_id', $userToInvite->player->id)->update([
@@ -673,19 +884,51 @@ class MatchController extends Controller
         $month = strlen((string)$whenPlay->month) === 1 ? '0'.$whenPlay->month : $whenPlay->month;
         $hour = strlen((string)$whenPlay->hour) === 1 ? '0'.$whenPlay->hour : $whenPlay->hour;
         $minutes = strlen((string)$whenPlay->minute) === 1 ? '0'.$whenPlay->minute : $whenPlay->minute;
-        $userDevicesTokens = $userWhoInvited->devices->pluck('token')->toArray();
 
-        FcmPushNotificationsService::sendRejectMatchInvitation(
-            __('notifications.match.reject', [
-                'userName' => $user->name,
-                'day' => $day . '/' . $month,
-                'hour' => $hour . ':' . $minutes
-            ]),
-            [
-                'match_id' => $match->id
-            ],
-            $userDevicesTokens
-        );
+        $userDevicesTokensEn = [];
+        $userDevicesTokensEs = [];
+        foreach ($userWhoInvited->devices as $device) {
+            if ($device->token) {
+                if ($device->language === null) {
+                    $userDevicesTokensEn[] = $device->token;
+                } elseif (str_contains($device->language, 'en')) {
+                    $userDevicesTokensEs[] = $device->token;
+                } elseif (str_contains($device->language, 'es')) {
+                    $userDevicesTokensEs[] = $device->token;
+                } else {
+                    $userDevicesTokensEn[] = $device->token;
+                }
+            }
+        }
+
+        if(!empty($userDevicesTokensEn)) {
+            App::setLocale('en');
+            FcmPushNotificationsService::sendRejectMatchInvitation(
+                __('notifications.match.reject', [
+                    'userName' => $user->name,
+                    'day' => $day . '/' . $month,
+                    'hour' => $hour . ':' . $minutes
+                ]),
+                [
+                    'match_id' => $match->id
+                ],
+                $userDevicesTokensEn
+            );
+        }
+        if (!empty($userDevicesTokensEs)) {
+            App::setLocale('es');
+            FcmPushNotificationsService::sendRejectMatchInvitation(
+                __('notifications.match.reject', [
+                    'userName' => $user->name,
+                    'day' => $day . '/' . $month,
+                    'hour' => $hour . ':' . $minutes
+                ]),
+                [
+                    'match_id' => $match->id
+                ],
+                $userDevicesTokensEs
+            );
+        }
 
         $matches = $this->returnAllMatches($request);
 
@@ -732,30 +975,87 @@ class MatchController extends Controller
         $month = strlen((string)$whenPlay->month) === 1 ? '0'.$whenPlay->month : $whenPlay->month;
         $hour = strlen((string)$whenPlay->hour) === 1 ? '0'.$whenPlay->hour : $whenPlay->hour;
         $minutes = strlen((string)$whenPlay->minute) === 1 ? '0'.$whenPlay->minute : $whenPlay->minute;
-        $userDevicesTokens = $userWhoInvited->devices->pluck('token')->toArray();
 
-        FcmPushNotificationsService::sendJoinedToMatch(
-            __('notifications.match.join', [
-                'userName' => $userWhoJoin->name,
-                'day' => $day . '/' . $month,
-                'hour' => $hour . ':' . $minutes
-            ]),
-            [
-                'match_id' => $match->id
-            ],
-            $userDevicesTokens
-        );
+        $userDevicesTokensEn = [];
+        $userDevicesTokensEs = [];
+        foreach ($userWhoInvited->devices as $device) {
+            if ($device->token) {
+                if ($device->language === null) {
+                    $userDevicesTokensEn[] = $device->token;
+                } elseif (str_contains($device->language, 'en')) {
+                    $userDevicesTokensEs[] = $device->token;
+                } elseif (str_contains($device->language, 'es')) {
+                    $userDevicesTokensEs[] = $device->token;
+                } else {
+                    $userDevicesTokensEn[] = $device->token;
+                }
+            }
+        }
+        if (!empty($userDevicesTokensEn)) {
+            App::setLocale('en');
+            FcmPushNotificationsService::sendJoinedToMatch(
+                __('notifications.match.join', [
+                    'userName' => $userWhoJoin->name,
+                    'day' => $day . '/' . $month,
+                    'hour' => $hour . ':' . $minutes
+                ]),
+                [
+                    'match_id' => $match->id
+                ],
+                $userDevicesTokensEn
+            );
+        }
+        if (!empty($userDevicesTokensEs)) {
+            App::setLocale('es');
+            FcmPushNotificationsService::sendJoinedToMatch(
+                __('notifications.match.join', [
+                    'userName' => $userWhoJoin->name,
+                    'day' => $day . '/' . $month,
+                    'hour' => $hour . ':' . $minutes
+                ]),
+                [
+                    'match_id' => $match->id
+                ],
+                $userDevicesTokensEs
+            );
+        }
 
         $otherPlayers = $match->players()->where('player_id', '<>', $userWhoJoin->player->id)->get();
         $otherPlayers->map(function ($player) use ($match){
-            $userDevicesTokens = $player->user->devices->pluck('token')->toArray();
-            if(!empty($userDevicesTokens)) {
+            $userDevicesTokensEn = [];
+            $userDevicesTokensEs = [];
+            foreach ($player->user->devices as $device) {
+                if ($device->token) {
+                    if ($device->language === null) {
+                        $userDevicesTokensEn[] = $device->token;
+                    } elseif (str_contains($device->language, 'en')) {
+                        $userDevicesTokensEs[] = $device->token;
+                    } elseif (str_contains($device->language, 'es')) {
+                        $userDevicesTokensEs[] = $device->token;
+                    } else {
+                        $userDevicesTokensEn[] = $device->token;
+                    }
+                }
+            }
+            if(!empty($userDevicesTokensEn)) {
+                App::setLocale('en');
                 FcmPushNotificationsService::sendSilence(
                     'silence_join_match',
                     [
                         'match_id' => $match->id
                     ],
-                    $userDevicesTokens
+                    $userDevicesTokensEn
+                );
+            }
+
+            if(!empty($userDevicesTokensEs)) {
+                App::setLocale('es');
+                FcmPushNotificationsService::sendSilence(
+                    'silence_join_match',
+                    [
+                        'match_id' => $match->id
+                    ],
+                    $userDevicesTokensEs
                 );
             }
         });
@@ -804,30 +1104,87 @@ class MatchController extends Controller
         $month = strlen((string)$whenPlay->month) === 1 ? '0'.$whenPlay->month : $whenPlay->month;
         $hour = strlen((string)$whenPlay->hour) === 1 ? '0'.$whenPlay->hour : $whenPlay->hour;
         $minutes = strlen((string)$whenPlay->minute) === 1 ? '0'.$whenPlay->minute : $whenPlay->minute;
-        $userDevicesTokens = $userWhoInvited->devices->pluck('token')->toArray();
-
-        FcmPushNotificationsService::sendLeftMatch(
-            __('notifications.match.left', [
-                'userName' => $userWhoJoin->name,
-                'day' => $day . '/' . $month,
-                'hour' => $hour . ':' . $minutes
-            ]),
-            [
-                'match_id' => $match->id
-            ],
-            $userDevicesTokens
-        );
+        $userDevicesTokensEn = [];
+        $userDevicesTokensEs = [];
+        foreach ($userWhoInvited->devices as $device) {
+            if ($device->token) {
+                if ($device->language === null) {
+                    $userDevicesTokensEn[] = $device->token;
+                } elseif (str_contains($device->language, 'en')) {
+                    $userDevicesTokensEs[] = $device->token;
+                } elseif (str_contains($device->language, 'es')) {
+                    $userDevicesTokensEs[] = $device->token;
+                } else {
+                    $userDevicesTokensEn[] = $device->token;
+                }
+            }
+        }
+        if (!empty($userDevicesTokensEn)) {
+            App::setLocale('en');
+            FcmPushNotificationsService::sendLeftMatch(
+                __('notifications.match.left', [
+                    'userName' => $userWhoJoin->name,
+                    'day' => $day . '/' . $month,
+                    'hour' => $hour . ':' . $minutes
+                ]),
+                [
+                    'match_id' => $match->id
+                ],
+                $userDevicesTokensEn
+            );
+        }
+        if (!empty($userDevicesTokensEs)) {
+            App::setLocale('es');
+            FcmPushNotificationsService::sendLeftMatch(
+                __('notifications.match.left', [
+                    'userName' => $userWhoJoin->name,
+                    'day' => $day . '/' . $month,
+                    'hour' => $hour . ':' . $minutes
+                ]),
+                [
+                    'match_id' => $match->id
+                ],
+                $userDevicesTokensEs
+            );
+        }
 
         $otherPlayers = $match->players()->where('player_id', '<>', $userWhoJoin->player->id)->get();
         $otherPlayers->map(function ($player) use ($match){
-            $userDevicesTokens = $player->user->devices->pluck('token')->toArray();
-            if(!empty($userDevicesTokens)) {
+            $userDevicesTokensEn = [];
+            $userDevicesTokensEs = [];
+            foreach ($player->user->devices as $device) {
+                if ($device->token) {
+                    if ($device->language === null) {
+                        $userDevicesTokensEn[] = $device->token;
+                    } elseif (str_contains($device->language, 'en')) {
+                        $userDevicesTokensEs[] = $device->token;
+                    } elseif (str_contains($device->language, 'es')) {
+                        $userDevicesTokensEs[] = $device->token;
+                    } else {
+                        $userDevicesTokensEn[] = $device->token;
+                    }
+                }
+            }
+
+            if(!empty($userDevicesTokensEn)) {
+                App::setLocale('en');
                 FcmPushNotificationsService::sendSilence(
                     'silence_leave_match',
                     [
                         'match_id' => $match->id
                     ],
-                    $userDevicesTokens
+                    $userDevicesTokensEn
+                );
+            }
+
+            if(!empty($userDevicesTokensEs)) {
+                App::setLocale('es');
+                FcmPushNotificationsService::sendSilence(
+                    'silence_leave_match',
+                    [
+                        'match_id' => $match->id
+                    ],
+                    $userDevicesTokensEs
                 );
             }
         });
@@ -935,6 +1292,18 @@ class MatchController extends Controller
         });
 
         return $matches;
+    }
+
+    /**
+     * @param $user
+     * @param Carbon $when_play
+     * @return mixed
+     */
+    protected function countMatchesThatWeek($user, Carbon $when_play)
+    {
+        $weekStartDate = $when_play->startOfWeek()->format('Y-m-d H:i');
+        $weekEndDate = $when_play->endOfWeek()->format('Y-m-d H:i');
+        return $user->player->matches->whereBetween('when_play', [$weekStartDate, $weekEndDate])->count();
     }
 
 }

@@ -233,6 +233,10 @@ class FcmPushNotificationsService
     static function sendMatchCreated($notificationTitle, $data, $devicesTokens)
     {
 
+        Log::info('======= Notification title translated =======');
+        Log::info($notificationTitle);
+        Log::info('======= Notification title translated =======');
+
         try {
             $client = new Client([
                 'base_uri' => 'https://fcm.googleapis.com',

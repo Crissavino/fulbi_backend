@@ -15,6 +15,7 @@ class Device extends Model
         'uuid',
         'user_id',
         'language',
+        'platform',
     ];
 
     public function user()

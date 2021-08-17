@@ -2219,6 +2219,12 @@ hr {
 /*# sourceMappingURL=style.css.map */
 
 /*PERSONAL*/
+
+#downloadButton:focus {
+    background: #fff;
+    color: #388E3C;
+}
+
 .centerElement {
     display: flex;
     justify-content: center;

@@ -77,7 +77,9 @@ class AuthController extends Controller
         ],[
             'user_id'     => $user->id,
             'uuid' => $request->uuid,
-            'token'   => $fcmToken
+            'token'   => $fcmToken,
+            'language' => $request->language,
+            'platform'   => $request->platform,
         ]);
 
         $response = response()->json([
@@ -129,7 +131,9 @@ class AuthController extends Controller
         ],[
             'user_id'     => $user->id,
             'uuid' => $request->uuid,
-            'token'   => $fcmToken
+            'token'   => $fcmToken,
+            'language' => $request->language,
+            'platform'   => $request->platform,
         ]);
 
         $user->player->positions;
@@ -440,7 +444,9 @@ class AuthController extends Controller
                     ],[
                         'user_id'     => $user->id,
                         'uuid' => $request->uuid,
-                        'token'   => $fcmToken
+                        'token'   => $fcmToken,
+                        'language' => $request->language,
+                        'platform'   => $request->platform,
                     ]);
 
                     $user->player->positions;
@@ -464,7 +470,9 @@ class AuthController extends Controller
                 ],[
                     'user_id'     => $user->id,
                     'uuid' => $request->uuid,
-                    'token'   => $fcmToken
+                    'token'   => $fcmToken,
+                    'language' => $request->language,
+                    'platform'   => $request->platform,
                 ]);
 
                 $user->player->positions;
@@ -572,7 +580,9 @@ class AuthController extends Controller
                     ],[
                         'user_id'     => $user->id,
                         'uuid' => $request->uuid,
-                        'token'   => $fcmToken
+                        'token'   => $fcmToken,
+                        'language' => $request->language,
+                        'platform'   => $request->platform,
                     ]);
 
                     $user->player->positions;
@@ -601,7 +611,9 @@ class AuthController extends Controller
                 ],[
                     'user_id'     => $user->id,
                     'uuid' => $request->uuid,
-                    'token'   => $fcmToken
+                    'token'   => $fcmToken,
+                    'language' => $request->language,
+                    'platform'   => $request->platform,
                 ]);
 
                 $user->player->positions;

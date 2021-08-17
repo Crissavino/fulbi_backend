@@ -524,7 +524,7 @@ FACEBOOK: https://www.facebook.com/themefisher
         let downloadButtonAndroid = document.getElementById('downloadButtonAndroid');
         let downloadButtonIOS = document.getElementById('downloadButtonIOS');
         const androidLink = 'https://play.google.com/store/apps/details?id=com.crissavino.fulbito.fulbito_app';
-        const iosLink = '#iosLink';
+        const iosLink = 'https://apps.apple.com/us/app/fulbito-app/id1576482106';
         if (platform === 'iOS') {
             downloadButton.setAttribute('href', iosLink);
         }else if (platform === 'Android') {
