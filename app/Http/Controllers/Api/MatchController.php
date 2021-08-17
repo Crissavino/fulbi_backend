@@ -68,7 +68,6 @@ class MatchController extends Controller
                 ];
             }
         }
-        $locationData = json_decode($locationData, true);
 
         $location = (new EloquentLocationService())->create(
             $locationData['lat'],
