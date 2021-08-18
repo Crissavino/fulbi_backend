@@ -41,7 +41,6 @@ class MatchController extends Controller
                 'message' => $parameters['message']
             ];
         }
-        $when_play = $parameters['when_play'];
         $genre_id = $parameters['genre_id'];
         $type_id = $parameters['type_id'];
         $is_free_match = $parameters['is_free_match'];
@@ -50,9 +49,6 @@ class MatchController extends Controller
         $num_players = $parameters['num_players'];
         $locationData = $parameters['locationData'];
         $user = $parameters['user'];
-        Log::info('====== $when_play2 ======');
-        Log::info($when_play);
-        Log::info('====== $when_play2 ======');
         if (!$user->premium) {
             if ($user->created_matches >= self::MAX_FREE_MATCHES) {
                 return [
@@ -62,7 +58,8 @@ class MatchController extends Controller
                 ];
             }
 
-            $matchesInThatWeek = $this->countMatchesThatWeek($user, $when_play);
+            // tengo q hacer esto porque me cambia el valor de when_play
+            $matchesInThatWeek = $this->countMatchesThatWeek($user, $parameters['when_play']);
             if ($matchesInThatWeek > self::MAX_FREE_MATCHES_BY_WEEK) {
                 return [
                     'success' => false,
@@ -87,10 +84,7 @@ class MatchController extends Controller
 
         $chat = (new EloquentChatService())->create();
 
-        Log::info('====== $when_play3 ======');
-        Log::info($when_play);
-        Log::info('====== $when_play3 ======');
-
+        $when_play = $parameters['when_play'];
         $match = (new EloquentMatchService())->create(
             $location->id,
             $when_play,
@@ -197,9 +191,6 @@ class MatchController extends Controller
             ];
         }
         $whenPlay = Carbon::createFromFormat('d/m/Y H:i', $whenPlay);
-        Log::info('====== $when_play1 ======');
-        Log::info($whenPlay);
-        Log::info('====== $when_play1 ======');
         $genreId = intval($request->genre_id);
         if (!$genreId) {
             return [
@@ -291,7 +282,6 @@ class MatchController extends Controller
                 'message' => $parameters['message']
             ];
         }
-        $when_play = $parameters['when_play'];
         $genre_id = $parameters['genre_id'];
         $type_id = $parameters['type_id'];
         $is_free_match = $parameters['is_free_match'];
@@ -308,7 +298,7 @@ class MatchController extends Controller
         }
 
         if (!$user->premium) {
-            $matchesInThatWeek = $this->countMatchesThatWeek($user, $when_play);
+            $matchesInThatWeek = $this->countMatchesThatWeek($user, $parameters['when_play']);
             if ($matchesInThatWeek > self::MAX_FREE_MATCHES_BY_WEEK) {
                 return [
                     'success' => false,
@@ -332,6 +322,7 @@ class MatchController extends Controller
             $locationData['is_by_lat_lng']
         );
 
+        $when_play = $parameters['when_play'];
         $match = (new EloquentMatchService())->update(
             $match->id,
             $when_play,
