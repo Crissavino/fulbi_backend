@@ -84,7 +84,10 @@ class MatchController extends Controller
 
         $chat = (new EloquentChatService())->create();
 
-        $when_play = $parameters['when_play'];
+        $when_play = Carbon::createFromFormat('d/m/Y H:i', $request->when_play);
+        Log::info('========= $when_play =========');
+        Log::info($when_play);
+        Log::info('========= $when_play =========');
         $match = (new EloquentMatchService())->create(
             $location->id,
             $when_play,
@@ -322,7 +325,10 @@ class MatchController extends Controller
             $locationData['is_by_lat_lng']
         );
 
-        $when_play = $parameters['when_play'];
+        $when_play = Carbon::createFromFormat('d/m/Y H:i', $request->when_play);
+        Log::info('========= $when_play =========');
+        Log::info($when_play);
+        Log::info('========= $when_play =========');
         $match = (new EloquentMatchService())->update(
             $match->id,
             $when_play,
@@ -930,6 +936,10 @@ class MatchController extends Controller
         }
 
         $matches = $this->returnAllMatches($request);
+        $today = Carbon::now();
+        $matches = $matches->filter(function ($match) use ($today) {
+            return $match->when_play > $today->toDateTimeString();
+        });
 
         return response()->json([
             'success' => true,
@@ -1066,6 +1076,10 @@ class MatchController extends Controller
         });
 
         $matches = $this->returnAllMatches($request);
+        $today = Carbon::now();
+        $matches = $matches->filter(function ($match) use ($today) {
+            return $match->when_play > $today->toDateTimeString();
+        });
 
         return response()->json([
             'success' => true,
