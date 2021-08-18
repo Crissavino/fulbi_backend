@@ -50,6 +50,9 @@ class MatchController extends Controller
         $num_players = $parameters['num_players'];
         $locationData = $parameters['locationData'];
         $user = $parameters['user'];
+        Log::info('====== $when_play2 ======');
+        Log::info($when_play);
+        Log::info('====== $when_play2 ======');
         if (!$user->premium) {
             if ($user->created_matches >= self::MAX_FREE_MATCHES) {
                 return [
@@ -83,6 +86,10 @@ class MatchController extends Controller
         );
 
         $chat = (new EloquentChatService())->create();
+
+        Log::info('====== $when_play3 ======');
+        Log::info($when_play);
+        Log::info('====== $when_play3 ======');
 
         $match = (new EloquentMatchService())->create(
             $location->id,
@@ -190,7 +197,9 @@ class MatchController extends Controller
             ];
         }
         $whenPlay = Carbon::createFromFormat('d/m/Y H:i', $whenPlay);
-
+        Log::info('====== $when_play1 ======');
+        Log::info($whenPlay);
+        Log::info('====== $when_play1 ======');
         $genreId = intval($request->genre_id);
         if (!$genreId) {
             return [
