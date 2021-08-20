@@ -50,7 +50,7 @@ class MatchController extends Controller
         $locationData = $parameters['locationData'];
         $user = $parameters['user'];
         if (!$user->premium) {
-            if ($user->created_matches >= self::MAX_FREE_MATCHES) {
+            if ($user->matches_created >= self::MAX_FREE_MATCHES) {
                 return [
                     'success' => false,
                     'max_free_matches_reached' => true,
@@ -85,9 +85,7 @@ class MatchController extends Controller
         $chat = (new EloquentChatService())->create();
 
         $when_play = Carbon::createFromFormat('d/m/Y H:i', $request->when_play);
-        Log::info('========= $when_play =========');
-        Log::info($when_play);
-        Log::info('========= $when_play =========');
+
         $match = (new EloquentMatchService())->create(
             $location->id,
             $when_play,
