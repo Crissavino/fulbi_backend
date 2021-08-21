@@ -68,7 +68,7 @@ class MatchController extends Controller
                 ];
             }
         }
-        $locationData = json_decode($locationData, true);
+//        $locationData = json_decode($locationData, true);
 
         $location = (new EloquentLocationService())->create(
             $locationData['lat'],
@@ -325,9 +325,6 @@ class MatchController extends Controller
         );
 
         $when_play = Carbon::createFromFormat('d/m/Y H:i', $request->when_play);
-        Log::info('========= $when_play =========');
-        Log::info($when_play);
-        Log::info('========= $when_play =========');
         $match = (new EloquentMatchService())->update(
             $match->id,
             $when_play,
