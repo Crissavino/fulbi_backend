@@ -1264,6 +1264,61 @@ class MatchController extends Controller
         }
         $match->players()->wherePivot('match_id', $match->id)->detach();
 
+        $gr_circle_radius = 6371;
+        $max_distance = self::DEFAULT_MATCH_RANGE;
+        $matchLat = $match->location->lat;
+        $matchLng = $match->location->lng;
+        $distance_select = sprintf(
+            "( %d * acos( cos( radians(%s) ) " .
+            " * cos( radians( lat ) ) " .
+            " * cos( radians( lng ) - radians(%s) ) " .
+            " + sin( radians(%s) ) * sin( radians( lat ) ) " .
+            " ) " .
+            ")",
+            $gr_circle_radius,
+            $matchLat,
+            $matchLng,
+            $matchLat
+        );
+        $locations = Location::select('*')
+            ->having(DB::raw($distance_select), '<=', $max_distance)
+            ->get();
+
+        $players = Player::where('id', '<>', $user->player->id)->whereIn('location_id', $locations->pluck('id'))->with(['user'])->get();
+        $players->map(function ($player) use ($request, $user, $match){
+            $userDevicesTokensEn = [];
+            $userDevicesTokensEs = [];
+            foreach ($player->user->devices as $device) {
+                if ($device->token) {
+                    if ($device->language === null) {
+                        $userDevicesTokensEn[] = $device->token;
+                    } elseif (str_contains($device->language, 'en')) {
+                        $userDevicesTokensEn[] = $device->token;
+                    } elseif (str_contains($device->language, 'es')) {
+                        $userDevicesTokensEs[] = $device->token;
+                    } else {
+                        $userDevicesTokensEn[] = $device->token;
+                    }
+                }
+            }
+
+            FcmPushNotificationsService::sendSilence(
+                'silence_deleted_match',
+                [
+                    'match_id' => $match->id
+                ],
+                $userDevicesTokensEn
+            );
+
+            FcmPushNotificationsService::sendSilence(
+                'silence_deleted_match',
+                [
+                    'match_id' => $match->id
+                ],
+                $userDevicesTokensEs
+            );
+        });
+
         $match->delete();
 
         $matches = $this->returnAllMatches($request);
@@ -1275,6 +1330,7 @@ class MatchController extends Controller
 
         return response()->json([
             'success' => true,
+            'deletedId' => $request->match_id,
             'matches' => $matches->values()
         ]);
     }
