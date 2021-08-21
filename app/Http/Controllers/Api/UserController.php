@@ -303,6 +303,7 @@ class UserController extends Controller
             'versionMajor' => 1,
             'versionMinor' => 1,
             'versionPatch' => 26,
+            'checkVersion' => false,
         ]);
     }
 
