@@ -8,6 +8,7 @@ use App\Models\Message;
 use App\src\Infrastructure\Services\FcmPushNotificationsService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
@@ -39,8 +40,24 @@ class ChatController extends Controller
         $otherPlayers = $match->players()->where('player_id', '<>', $user->player->id)->get();
         $message->owner;
         $otherPlayers->map(function ($player) use ($message, $request, $match, $day, $month, $hour, $minutes){
-            $userDevicesTokens = $player->user->devices->pluck('token')->toArray();
-            if(!empty($userDevicesTokens)) {
+            $userDevicesTokensEn = [];
+            $userDevicesTokensEs = [];
+            foreach ($player->user->devices as $device) {
+                if ($device->token) {
+                    if ($device->language === null) {
+                        $userDevicesTokensEn[] = $device->token;
+                    } elseif (str_contains($device->language, 'en')) {
+                        $userDevicesTokensEn[] = $device->token;
+                    } elseif (str_contains($device->language, 'es')) {
+                        $userDevicesTokensEs[] = $device->token;
+                    } else {
+                        $userDevicesTokensEn[] = $device->token;
+                    }
+                }
+            }
+
+            if(!empty($userDevicesTokensEn)) {
+                App::setLocale('en');
                 FcmPushNotificationsService::sendChatTextMessage(
                     __('notifications.match.chat.newMessage', [
                         'userName' => $request->user()->name,
@@ -52,7 +69,7 @@ class ChatController extends Controller
                         'chat_id' => $request->chat_id,
                         'match_id' => $match->id
                     ],
-                    $userDevicesTokens
+                    $userDevicesTokensEn
                 );
 
                 FcmPushNotificationsService::sendSilence(
@@ -61,7 +78,33 @@ class ChatController extends Controller
                         'message' => $message,
                         'match_id' => $match->id
                     ],
-                    $userDevicesTokens
+                    $userDevicesTokensEn
+                );
+            }
+
+            if(!empty($userDevicesTokensEs)) {
+                App::setLocale('es');
+                FcmPushNotificationsService::sendChatTextMessage(
+                    __('notifications.match.chat.newMessage', [
+                        'userName' => $request->user()->name,
+                        'day' => $day . '/' . $month,
+                        'hour' => $hour . ':' . $minutes
+                    ]),
+                    $message->text,
+                    [
+                        'chat_id' => $request->chat_id,
+                        'match_id' => $match->id
+                    ],
+                    $userDevicesTokensEs
+                );
+
+                FcmPushNotificationsService::sendSilence(
+                    'silence_new_chat_message',
+                    [
+                        'message' => $message,
+                        'match_id' => $match->id
+                    ],
+                    $userDevicesTokensEs
                 );
             }
         });

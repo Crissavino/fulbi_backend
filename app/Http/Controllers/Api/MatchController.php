@@ -68,6 +68,7 @@ class MatchController extends Controller
                 ];
             }
         }
+        $locationData = json_decode($locationData, true);
 
         $location = (new EloquentLocationService())->create(
             $locationData['lat'],
@@ -130,7 +131,7 @@ class MatchController extends Controller
                     if ($device->language === null) {
                         $userDevicesTokensEn[] = $device->token;
                     } elseif (str_contains($device->language, 'en')) {
-                        $userDevicesTokensEs[] = $device->token;
+                        $userDevicesTokensEn[] = $device->token;
                     } elseif (str_contains($device->language, 'es')) {
                         $userDevicesTokensEs[] = $device->token;
                     } else {
@@ -353,7 +354,7 @@ class MatchController extends Controller
                     if ($device->language === null) {
                         $userDevicesTokensEn[] = $device->token;
                     } elseif (str_contains($device->language, 'en')) {
-                        $userDevicesTokensEs[] = $device->token;
+                        $userDevicesTokensEn[] = $device->token;
                     } elseif (str_contains($device->language, 'es')) {
                         $userDevicesTokensEs[] = $device->token;
                     } else {
@@ -647,7 +648,7 @@ class MatchController extends Controller
                 if ($device->language === null) {
                     $userDevicesTokensEn[] = $device->token;
                 } elseif (str_contains($device->language, 'en')) {
-                    $userDevicesTokensEs[] = $device->token;
+                    $userDevicesTokensEn[] = $device->token;
                 } elseif (str_contains($device->language, 'es')) {
                     $userDevicesTokensEs[] = $device->token;
                 } else {
@@ -727,7 +728,7 @@ class MatchController extends Controller
                 if ($device->language === null) {
                     $userDevicesTokensEn[] = $device->token;
                 } elseif (str_contains($device->language, 'en')) {
-                    $userDevicesTokensEs[] = $device->token;
+                    $userDevicesTokensEn[] = $device->token;
                 } elseif (str_contains($device->language, 'es')) {
                     $userDevicesTokensEs[] = $device->token;
                 } else {
@@ -807,7 +808,7 @@ class MatchController extends Controller
                 if ($device->language === null) {
                     $userDevicesTokensEn[] = $device->token;
                 } elseif (str_contains($device->language, 'en')) {
-                    $userDevicesTokensEs[] = $device->token;
+                    $userDevicesTokensEn[] = $device->token;
                 } elseif (str_contains($device->language, 'es')) {
                     $userDevicesTokensEs[] = $device->token;
                 } else {
@@ -895,7 +896,7 @@ class MatchController extends Controller
                 if ($device->language === null) {
                     $userDevicesTokensEn[] = $device->token;
                 } elseif (str_contains($device->language, 'en')) {
-                    $userDevicesTokensEs[] = $device->token;
+                    $userDevicesTokensEn[] = $device->token;
                 } elseif (str_contains($device->language, 'es')) {
                     $userDevicesTokensEs[] = $device->token;
                 } else {
@@ -990,7 +991,7 @@ class MatchController extends Controller
                 if ($device->language === null) {
                     $userDevicesTokensEn[] = $device->token;
                 } elseif (str_contains($device->language, 'en')) {
-                    $userDevicesTokensEs[] = $device->token;
+                    $userDevicesTokensEn[] = $device->token;
                 } elseif (str_contains($device->language, 'es')) {
                     $userDevicesTokensEs[] = $device->token;
                 } else {
@@ -1036,7 +1037,7 @@ class MatchController extends Controller
                     if ($device->language === null) {
                         $userDevicesTokensEn[] = $device->token;
                     } elseif (str_contains($device->language, 'en')) {
-                        $userDevicesTokensEs[] = $device->token;
+                        $userDevicesTokensEn[] = $device->token;
                     } elseif (str_contains($device->language, 'es')) {
                         $userDevicesTokensEs[] = $device->token;
                     } else {
@@ -1122,7 +1123,7 @@ class MatchController extends Controller
                 if ($device->language === null) {
                     $userDevicesTokensEn[] = $device->token;
                 } elseif (str_contains($device->language, 'en')) {
-                    $userDevicesTokensEs[] = $device->token;
+                    $userDevicesTokensEn[] = $device->token;
                 } elseif (str_contains($device->language, 'es')) {
                     $userDevicesTokensEs[] = $device->token;
                 } else {
@@ -1168,7 +1169,7 @@ class MatchController extends Controller
                     if ($device->language === null) {
                         $userDevicesTokensEn[] = $device->token;
                     } elseif (str_contains($device->language, 'en')) {
-                        $userDevicesTokensEs[] = $device->token;
+                        $userDevicesTokensEn[] = $device->token;
                     } elseif (str_contains($device->language, 'es')) {
                         $userDevicesTokensEs[] = $device->token;
                     } else {
