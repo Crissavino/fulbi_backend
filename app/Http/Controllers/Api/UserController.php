@@ -301,9 +301,9 @@ class UserController extends Controller
         return response()->json([
             'success' => true,
             'versionMajor' => 1,
-            'versionMinor' => 1,
-            'versionPatch' => 26,
-            'checkVersion' => false,
+            'versionMinor' => 2,
+            'versionPatch' => 0,
+            'checkVersion' => true,
         ]);
     }
 
