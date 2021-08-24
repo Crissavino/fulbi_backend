@@ -259,7 +259,7 @@ class MatchController extends Controller
     public function getMatch($id)
     {
         $match = Match::find($id);
-        $match->participants = $match->players()->with(['user'])->get()->pluck('user');
+        $match->participants = $match->players()->where('is_confirmed', true)->with(['user'])->get()->pluck('user');
         $match->cost = number_format($match->cost, 2);
         $match->is_confirmed = $match->players()->where('player_id', request()->user()->player->id)->where('is_confirmed', true)->exists();
         $match->have_notifications = $match->players()->where('player_id', request()->user()->player->id)->where('have_notifications', true)->exists();
@@ -604,9 +604,7 @@ class MatchController extends Controller
         $matches = $matches->sortBy(function($match){
             $match->location;
             $match->cost = number_format($match->cost, 2);
-            $match->participants = $match->players->map(function ($player) use ($match){
-                return $player->user;
-            });
+            $match->participants = $match->players()->where('is_confirmed', true)->with(['user'])->get()->pluck('user');
             return $match->when_play;
         });
 
@@ -1067,9 +1065,7 @@ class MatchController extends Controller
 
         $match->location;
         $match->cost = number_format($match->cost, 2);
-        $match->participants = $match->players->map(function ($player) use ($match) {
-            return $player->user;
-        });
+        $match->participants = $match->players()->where('is_confirmed', true)->with(['user'])->get()->pluck('user');
 
         $matches = $this->returnAllMatches($request);
         $today = Carbon::now();
@@ -1086,8 +1082,8 @@ class MatchController extends Controller
 
     public function leaveMatch(Request $request) {
 
-        $userWhoJoin = $request->user();
-        $player = $userWhoJoin->player;
+        $userWhoLeave = $request->user();
+        $player = $userWhoLeave->player;
         $match = Match::find($request->match_id);
         $userWhoInvited = User::find($match->owner_id);
         $isInTheMatch = $match->players()->where('player_id', $player->id)->exists();
@@ -1101,9 +1097,9 @@ class MatchController extends Controller
 
         Message::create([
             'text' => __('notifications.match.chat.left', [
-                'userName' => $userWhoJoin->name
+                'userName' => $userWhoLeave->name
             ]),
-            'owner_id' => $userWhoJoin->id,
+            'owner_id' => $userWhoLeave->id,
             'chat_id' => $match->chat->id,
             'type' => 4
         ]);
@@ -1132,7 +1128,7 @@ class MatchController extends Controller
             App::setLocale('en');
             FcmPushNotificationsService::sendLeftMatch(
                 __('notifications.match.left', [
-                    'userName' => $userWhoJoin->name,
+                    'userName' => $userWhoLeave->name,
                     'day' => $day . '/' . $month,
                     'hour' => $hour . ':' . $minutes
                 ]),
@@ -1146,7 +1142,7 @@ class MatchController extends Controller
             App::setLocale('es');
             FcmPushNotificationsService::sendLeftMatch(
                 __('notifications.match.left', [
-                    'userName' => $userWhoJoin->name,
+                    'userName' => $userWhoLeave->name,
                     'day' => $day . '/' . $month,
                     'hour' => $hour . ':' . $minutes
                 ]),
@@ -1157,7 +1153,7 @@ class MatchController extends Controller
             );
         }
 
-        $otherPlayers = $match->players()->where('player_id', '<>', $userWhoJoin->player->id)->get();
+        $otherPlayers = $match->players()->where('player_id', '<>', $userWhoLeave->player->id)->get();
         $otherPlayers->map(function ($player) use ($match){
             $userDevicesTokensEn = [];
             $userDevicesTokensEs = [];
@@ -1211,6 +1207,103 @@ class MatchController extends Controller
         ]);
     }
 
+    public function expelFromMatch(Request $request)
+    {
+        $userWhoExpel = $request->user();
+        $userToExpel = User::find($request->user_to_expel);
+        $playerToExpel = $userToExpel->player;
+        $match = Match::find($request->match_id);
+        if ($userWhoExpel->id ==! $match->owner_id) {
+            return response()->json([
+                'success' => false
+            ]);
+        }
+
+        $match->players()->wherePivot('match_id', $match->id)->wherePivot('player_id', $playerToExpel->id)->detach();
+
+        Message::create([
+            'text' => __('notifications.match.chat.expelled', [
+                'userName' => $userToExpel->name
+            ]),
+            'owner_id' => $userWhoExpel->id,
+            'chat_id' => $match->chat->id,
+            'type' => 4
+        ]);
+
+        $otherPlayers = $match->players()->where('player_id', '<>', $userWhoExpel->player->id)->get();
+        $otherPlayers->map(function ($player) use ($match, $userToExpel){
+            $userDevicesTokensEn = [];
+            $userDevicesTokensEs = [];
+            foreach ($player->user->devices as $device) {
+                if ($device->token) {
+                    if ($device->language === null) {
+                        $userDevicesTokensEn[] = $device->token;
+                    } elseif (str_contains($device->language, 'en')) {
+                        $userDevicesTokensEn[] = $device->token;
+                    } elseif (str_contains($device->language, 'es')) {
+                        $userDevicesTokensEs[] = $device->token;
+                    } else {
+                        $userDevicesTokensEn[] = $device->token;
+                    }
+                }
+            }
+
+            if(!empty($userDevicesTokensEn)) {
+                App::setLocale('en');
+                if ($player->user->id == $userToExpel->id) {
+                    FcmPushNotificationsService::sendSilence(
+                        'silence_im_expelled',
+                        [
+                            'match_id' => $match->id
+                        ],
+                        $userDevicesTokensEn
+                    );
+                } else {
+                    FcmPushNotificationsService::sendSilence(
+                        'silence_player_expelled',
+                        [
+                            'match_id' => $match->id
+                        ],
+                        $userDevicesTokensEn
+                    );
+                }
+            }
+
+            if(!empty($userDevicesTokensEs)) {
+                App::setLocale('es');
+                if ($player->user->id == $userToExpel->id) {
+                    FcmPushNotificationsService::sendSilence(
+                        'silence_im_expelled',
+                        [
+                            'match_id' => $match->id
+                        ],
+                        $userDevicesTokensEn
+                    );
+                } else {
+                    FcmPushNotificationsService::sendSilence(
+                        'silence_player_expelled',
+                        [
+                            'match_id' => $match->id
+                        ],
+                        $userDevicesTokensEs
+                    );
+                }
+            }
+        });
+
+        $matches = $this->returnAllMatches($request);
+        $today = Carbon::now();
+        $matches = $matches->filter(function ($match) use ($today) {
+            return $match->when_play > $today->toDateTimeString();
+        });
+        $matches = $matches->where('is_closed', false);
+
+        return response()->json([
+            'success' => true,
+            'matches' => $matches->values()
+        ]);
+    }
+
     public function getMyMatches(Request $request)
     {
         $matches = $this->returnAllMatches($request);
@@ -1240,9 +1333,7 @@ class MatchController extends Controller
             $match->have_notifications = $match->players()->where('player_id', $request->user()->player->id)
                 ->where('have_notifications', true)->exists();
             $match->cost = number_format($match->cost, 2);
-            $match->participants = $match->players->map(function ($player) use ($match) {
-                return $player->user;
-            });
+            $match->participants = $match->players()->where('is_confirmed', true)->with(['user'])->get()->pluck('user');
             return $match->when_play;
         });
 
@@ -1350,9 +1441,7 @@ class MatchController extends Controller
             $match->have_notifications = $match->players()->where('player_id', $request->user()->player->id)->where('have_notifications', true)->exists();
             $match->is_confirmed = $match->players()->where('player_id', $request->user()->player->id)->where('is_confirmed', true)->exists();
             $match->cost = number_format($match->cost, 2);
-            $match->participants = $match->players->map(function ($player) use ($match) {
-                return $player->user;
-            });
+            $match->participants = $match->players()->where('is_confirmed', true)->with(['user'])->get()->pluck('user');
             return $match->when_play;
         });
 

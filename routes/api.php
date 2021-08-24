@@ -43,6 +43,7 @@ Route::post('/matches/get-matches-offers',[MatchController::class, 'getMatchesOf
 Route::get('/matches/get-my-matches',[MatchController::class, 'getMyMatches'])->middleware('auth:sanctum');
 Route::post('/join-match',[MatchController::class, 'joinMatch'])->middleware('auth:sanctum');
 Route::post('/leave-match',[MatchController::class, 'leaveMatch'])->middleware('auth:sanctum');
+Route::post('/matches/expel-from-match',[MatchController::class, 'expelFromMatch'])->middleware('auth:sanctum');
 Route::post('/matches/reject-invitation',[MatchController::class, 'rejectInvitationToMatch'])->middleware('auth:sanctum');
 Route::get('/get-my-created-matches',[MatchController::class, 'getMyCreatedMatches'])->middleware('auth:sanctum');
 Route::post('/matches/send-invitation-to-user',[MatchController::class, 'sendInvitationToUser'])->middleware('auth:sanctum');

@@ -12,6 +12,7 @@ return [
             'join' => ':userName joined the match',
             'left' => ':userName left the match',
             'edited' => ':userName edited the match, check it!',
+            'expelled' => ':userName was expelled from the match',
         ]
     ],
 

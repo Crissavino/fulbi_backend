@@ -12,6 +12,7 @@ return [
             'join' => ':userName se unió al partido',
             'left' => ':userName abandonó el partid',
             'edited' => ':userName editó el partido, compruebalo!',
+            'expelled' => ':userName fue expulsado del partido',
         ]
     ],
 
