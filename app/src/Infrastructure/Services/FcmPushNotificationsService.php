@@ -335,9 +335,9 @@ class FcmPushNotificationsService
                 ]
             ]);
 
-            Log::info("devicesTokens ============");
-            Log::info(json_encode($devicesTokens));
-            Log::info("============ devicesTokens");
+            Log::info("silenceType ============");
+            Log::info(json_encode($silenceType));
+            Log::info("============ silenceType");
 
             $body = $response->getBody();
             $bodyContent = $body->getContents();

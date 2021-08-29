@@ -11,6 +11,7 @@ return [
             'newMessage' => ':userName sent a message in the match of :day at :hour',
             'join' => ':userName joined the match',
             'left' => ':userName left the match',
+            'created' => ':userName created the match on :dateCreated',
             'edited' => ':userName edited the match, check it!',
             'expelled' => ':userName was expelled from the match',
         ]

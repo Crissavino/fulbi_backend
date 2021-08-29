@@ -31,6 +31,7 @@ class MatchController extends Controller
     const MIX_GENRE_ID = 3;
     const MAX_FREE_MATCHES = 5;
     const MAX_FREE_MATCHES_BY_WEEK = 3;
+    const HOURS_PAST_MATCHES_STAY = 2;
 
     public function store(Request $request)
     {
@@ -51,6 +52,8 @@ class MatchController extends Controller
         $user = $parameters['user'];
         if (!$user->premium) {
             if ($user->matches_created >= self::MAX_FREE_MATCHES) {
+                Log::info('========== maxMatchesReached =============');
+                Log::info('userId ====>>   ' . $user->id);
                 return [
                     'success' => false,
                     'max_free_matches_reached' => true,
@@ -61,6 +64,8 @@ class MatchController extends Controller
             // tengo q hacer esto porque me cambia el valor de when_play
             $matchesInThatWeek = $this->countMatchesThatWeek($user, $parameters['when_play']);
             if ($matchesInThatWeek > self::MAX_FREE_MATCHES_BY_WEEK) {
+                Log::info('========== maxMatchesByWeekReached =============');
+                Log::info('userId ====>>   ' . $user->id);
                 return [
                     'success' => false,
                     'max_free_matches_by_week_reached' => true,
@@ -174,6 +179,13 @@ class MatchController extends Controller
                 );
             }
         });
+
+        Message::create([
+            'text' => $match->created_at->format('d/m/Y'),
+            'owner_id' => $user->id,
+            'chat_id' => $match->chat->id,
+            'type' => 4
+        ]);
 
         return response()->json([
             'success' => true,
@@ -608,7 +620,7 @@ class MatchController extends Controller
             return $match->when_play;
         });
 
-        $today = Carbon::now();
+        $today = Carbon::now()->subHours(self::HOURS_PAST_MATCHES_STAY);
         $matches = $matches->filter(function ($match) use ($today) {
             return $match->when_play > $today->toDateTimeString();
         });
@@ -930,7 +942,7 @@ class MatchController extends Controller
         }
 
         $matches = $this->returnAllMatches($request);
-        $today = Carbon::now();
+        $today = Carbon::now()->subHours(self::HOURS_PAST_MATCHES_STAY);
         $matches = $matches->filter(function ($match) use ($today) {
             return $match->when_play > $today->toDateTimeString();
         });
@@ -1068,7 +1080,7 @@ class MatchController extends Controller
         $match->participants = $match->players()->where('is_confirmed', true)->with(['user'])->get()->pluck('user');
 
         $matches = $this->returnAllMatches($request);
-        $today = Carbon::now();
+        $today = Carbon::now()->subHours(self::HOURS_PAST_MATCHES_STAY);
         $matches = $matches->filter(function ($match) use ($today) {
             return $match->when_play > $today->toDateTimeString();
         });
@@ -1195,7 +1207,7 @@ class MatchController extends Controller
         });
 
         $matches = $this->returnAllMatches($request);
-        $today = Carbon::now();
+        $today = Carbon::now()->subHours(self::HOURS_PAST_MATCHES_STAY);
         $matches = $matches->filter(function ($match) use ($today) {
             return $match->when_play > $today->toDateTimeString();
         });
@@ -1292,7 +1304,7 @@ class MatchController extends Controller
         });
 
         $matches = $this->returnAllMatches($request);
-        $today = Carbon::now();
+        $today = Carbon::now()->subHours(self::HOURS_PAST_MATCHES_STAY);
         $matches = $matches->filter(function ($match) use ($today) {
             return $match->when_play > $today->toDateTimeString();
         });
@@ -1307,7 +1319,7 @@ class MatchController extends Controller
     public function getMyMatches(Request $request)
     {
         $matches = $this->returnAllMatches($request);
-        $today = Carbon::now();
+        $today = Carbon::now()->subHours(self::HOURS_PAST_MATCHES_STAY);
         $matches = $matches->filter(function ($match) use ($today) {
             return $match->when_play > $today->toDateTimeString();
         });
@@ -1322,7 +1334,7 @@ class MatchController extends Controller
     public function getMyCreatedMatches(Request $request)
     {
         $matches = Match::all();
-        $today = Carbon::now();
+        $today = Carbon::now()->subHours(self::HOURS_PAST_MATCHES_STAY);
         $matches = $matches->filter(function ($match) use ($today) {
             return $match->when_play > $today->toDateTimeString();
         });
@@ -1413,7 +1425,7 @@ class MatchController extends Controller
         $match->delete();
 
         $matches = $this->returnAllMatches($request);
-        $today = Carbon::now();
+        $today = Carbon::now()->subHours(self::HOURS_PAST_MATCHES_STAY);
         $matches = $matches->filter(function ($match) use ($today) {
             return $match->when_play > $today->toDateTimeString();
         });
