@@ -256,14 +256,6 @@ class MatchController extends Controller
             ];
         }
 
-        $description = $request->description;
-        if (!$description) {
-            return [
-                'success' => false,
-                'message' => __('errors.missingParameter')
-            ];
-        }
-
          return [
              'success' => true,
              'when_play' => $whenPlay,
@@ -274,7 +266,7 @@ class MatchController extends Controller
              'cost' => $cost,
              'num_players' => $numPlayers,
              'locationData' => $locationData,
-             'description' => $description,
+             'description' => $request->description,
              'user' => $request->user()
         ];
     }
@@ -522,14 +514,6 @@ class MatchController extends Controller
             ];
         }
 
-        $description = $request->description;
-        if (!$description) {
-            return [
-                'success' => false,
-                'message' => __('errors.missingParameter')
-            ];
-        }
-
         return [
             'success' => true,
             'when_play' => $whenPlay,
@@ -542,7 +526,7 @@ class MatchController extends Controller
             'locationData' => $locationData,
             'userId' => $request->user()->id,
             'user' => $request->user(),
-            'description' => $description,
+            'description' => $request->description,
             'match' => $match
         ];
     }
