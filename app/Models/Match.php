@@ -21,7 +21,8 @@ class Match extends Model
         'chat_id',
         'owner_id',
         'currency_id',
-        'have_notifications'
+        'have_notifications',
+        'description'
     ];
 
     //protected $with = ['location', 'genre', 'type', 'chat', 'owner', 'players'];

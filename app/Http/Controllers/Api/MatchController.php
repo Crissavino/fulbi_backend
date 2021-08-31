@@ -49,6 +49,7 @@ class MatchController extends Controller
         $cost = $parameters['cost'];
         $num_players = $parameters['num_players'];
         $locationData = $parameters['locationData'];
+        $description = $parameters['description'];
         $user = $parameters['user'];
         if (!$user->premium) {
             if ($user->matches_created >= self::MAX_FREE_MATCHES) {
@@ -102,7 +103,8 @@ class MatchController extends Controller
             $currency_id,
             $cost,
             $chat->id,
-            $user->id
+            $user->id,
+            $description
         );
 
         (new EloquentUserService())->addOneCreatedMatch($user);
@@ -254,17 +256,26 @@ class MatchController extends Controller
             ];
         }
 
+        $description = $request->description;
+        if (!$description) {
+            return [
+                'success' => false,
+                'message' => __('errors.missingParameter')
+            ];
+        }
+
          return [
-            'success' => true,
-            'when_play' => $whenPlay,
-            'genre_id' => $genreId,
-            'type_id' => $typeId,
-            'is_free_match' => $isFreeMatch,
-            'currency_id' => $currencyId,
-            'cost' => $cost,
-            'num_players' => $numPlayers,
-            'locationData' => $locationData,
-            'user' => $request->user()
+             'success' => true,
+             'when_play' => $whenPlay,
+             'genre_id' => $genreId,
+             'type_id' => $typeId,
+             'is_free_match' => $isFreeMatch,
+             'currency_id' => $currencyId,
+             'cost' => $cost,
+             'num_players' => $numPlayers,
+             'locationData' => $locationData,
+             'description' => $description,
+             'user' => $request->user()
         ];
     }
 
@@ -304,6 +315,7 @@ class MatchController extends Controller
         $num_players = $parameters['num_players'];
         $locationData = $parameters['locationData'];
         $user = $parameters['user'];
+        $description = $parameters['description'];
         $match = $parameters['match'];
         if ($match->owner_id !== $user->id) {
             return [
@@ -345,7 +357,8 @@ class MatchController extends Controller
             $num_players,
             $is_free_match,
             $currency_id,
-            $cost
+            $cost,
+            $description
         );
 
         $whenPlay = Carbon::createFromFormat('Y-m-d H:i:s', $match->when_play);
@@ -427,6 +440,7 @@ class MatchController extends Controller
             'chat_id' => $match->chat->id,
             'type' => 4
         ]);
+
         $message->players()->syncWithoutDetaching($match->players->pluck('id'));
 
         $match->players()->where('player_id', '<>', $user->player->id)->update([
@@ -508,6 +522,14 @@ class MatchController extends Controller
             ];
         }
 
+        $description = $request->description;
+        if (!$description) {
+            return [
+                'success' => false,
+                'message' => __('errors.missingParameter')
+            ];
+        }
+
         return [
             'success' => true,
             'when_play' => $whenPlay,
@@ -520,6 +542,7 @@ class MatchController extends Controller
             'locationData' => $locationData,
             'userId' => $request->user()->id,
             'user' => $request->user(),
+            'description' => $description,
             'match' => $match
         ];
     }

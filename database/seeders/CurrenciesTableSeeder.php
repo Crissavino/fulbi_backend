@@ -26,6 +26,11 @@ class CurrenciesTableSeeder extends Seeder
                     'code' => 'gbp',
                     'symbol' => '£'
                 ],
+                [
+                    'name' => 'Peso argentino',
+                    'code' => 'ars',
+                    'symbol' => '$'
+                ],
             ]
         );
     }
