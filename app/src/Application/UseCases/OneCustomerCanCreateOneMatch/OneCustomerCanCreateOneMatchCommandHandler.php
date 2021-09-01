@@ -4,6 +4,7 @@
 namespace App\src\Application\UseCases\OneCustomerCanCreateOneMatch;
 
 
+use App\Models\Message;
 use App\src\Domain\Services\ChatService;
 use App\src\Domain\Services\LocationService;
 use App\src\Domain\Services\MatchService;
@@ -69,13 +70,8 @@ class OneCustomerCanCreateOneMatchCommandHandler
         $locationData = $parameters['locationData'];
         $userId = $parameters['userId'];
         $user = $parameters['user'];
-        if ($user->created_matches >= self::MAX_FREE_MATCHES) {
-            return [
-                'success' => false,
-                'max_free_matches_reached' => true,
-                'message' => __('errors.maxMatchesReached'),
-            ];
-        }
+        $is_free_match = $parameters['is_free_match'];
+        $description = $parameters['description'];
 
         $location = $this->locationService->create(
             $locationData->lat,
@@ -87,7 +83,7 @@ class OneCustomerCanCreateOneMatchCommandHandler
             $locationData->city,
             $locationData->place_id,
             $locationData->formatted_address,
-            false
+            $locationData->is_by_lat_lng
         );
 
         $chat = $this->chatService->create();
@@ -98,13 +94,22 @@ class OneCustomerCanCreateOneMatchCommandHandler
             $genre_id,
             $type_id,
             $num_players,
+            $is_free_match,
             $currency_id,
             $cost,
             $chat->id,
-            $userId
+            $userId,
+            $description
         );
 
         $this->userService->addOneCreatedMatch($user);
+
+        Message::create([
+            'text' => $match->created_at->format('d/m/Y'),
+            'owner_id' => $user->id,
+            'chat_id' => $match->chat->id,
+            'type' => 4
+        ]);
 
         return [
             'success' => true,
@@ -141,16 +146,17 @@ class OneCustomerCanCreateOneMatchCommandHandler
             ];
         }
 
-        $cost = floatval($command->getCost());
-        if (!$cost) {
+        $isFreeMatch = boolval($command->getIsFreeMatch());
+        $currencyId = intval($command->getCurrencyId());
+        if (!$currencyId) {
             return [
                 'success' => false,
                 'message' => __('errors.missingParameter')
             ];
         }
 
-        $currencyId = floatval($command->getCurrencyId());
-        if (!$currencyId) {
+        $cost = doubleval($command->getCost());
+        if (!$cost && !$isFreeMatch) {
             return [
                 'success' => false,
                 'message' => __('errors.missingParameter')
@@ -194,10 +200,12 @@ class OneCustomerCanCreateOneMatchCommandHandler
             'when_play' => $whenPlay,
             'genre_id' => $genreId,
             'type_id' => $typeId,
+            'is_free_match' => $isFreeMatch,
             'currency_id' => $currencyId,
             'cost' => $cost,
             'num_players' => $numPlayers,
             'locationData' => $locationData,
+            'description' => $command->getDescription(),
             'userId' => $userId,
             'user' => $user,
         ];

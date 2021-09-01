@@ -31,19 +31,27 @@ class MatchController extends Controller
         ]);
     }
 
-    public function add()
+    public function add(Request $request)
     {
         $apiKey = env('GOOGLE_PLACE_API_KEY', 'AIzaSyCIW7l5SSIkF7JS1LOQAi6Rcsmm_10yJTQ');
+        $mapBoxApiKey = env('MAP_BOX_API_KEY', 'pk.eyJ1IjoiY3Jpc3NhdmlubyIsImEiOiJja3JhejN4bHQxMWF2MnpwODA0dGFlemNzIn0.qWasazYjV_FaM7yD6pWAEw');
 
         $sport = Sport::where('name', 'futbol')->first();
         $types = $sport->types;
         $genres = Genre::all();
         $currencies = Currency::all();
+        $user = $request->user();
+        $userLocation = $user->player->location;
+        $userLat = doubleval($userLocation->lat);
+        $userLng = doubleval($userLocation->lng);
 
         return view('matches.create', [
             'apiKey' => $apiKey,
+            'mapBoxApiKey' => $mapBoxApiKey,
             'types' => $types,
             'genres' => $genres,
+            'userLat' => $userLat,
+            'userLng' => $userLng,
             'currencies' => $currencies
         ]);
     }
@@ -63,10 +71,12 @@ class MatchController extends Controller
             $requestResponse['when_play'],
             $requestResponse['genre_id'],
             $requestResponse['type_id'],
+            $requestResponse['is_free_match'],
             $requestResponse['currency_id'],
             $requestResponse['cost'],
             $requestResponse['num_players'],
             $requestResponse['locationData'],
+            $requestResponse['description'],
             $requestResponse['userId']
         ));
 
@@ -88,19 +98,23 @@ class MatchController extends Controller
     public function edit($id)
     {
         $apiKey = env('GOOGLE_PLACE_API_KEY', 'AIzaSyCIW7l5SSIkF7JS1LOQAi6Rcsmm_10yJTQ');
+        $mapBoxApiKey = env('MAP_BOX_API_KEY', 'pk.eyJ1IjoiY3Jpc3NhdmlubyIsImEiOiJja3JhejN4bHQxMWF2MnpwODA0dGFlemNzIn0.qWasazYjV_FaM7yD6pWAEw');
 
         $match = Match::find($id);
         $sport = Sport::where('name', 'futbol')->first();
         $types = $sport->types;
         $genres = Genre::all();
         $currencies = Currency::all();
+        $locationData = $match->location->toJson();
 
         return view('matches.update', [
             'apiKey' => $apiKey,
+            'mapBoxApiKey' => $mapBoxApiKey,
             'types' => $types,
             'genres' => $genres,
             'match' => $match,
             'currencies' => $currencies,
+            'locationData' => $locationData,
             'when_play' => Carbon::createFromFormat('Y-m-d H:i:s', $match->when_play)->format('d/m/Y H:i')
         ]);
     }
@@ -119,11 +133,13 @@ class MatchController extends Controller
             $requestResponse['when_play'],
             $requestResponse['genre_id'],
             $requestResponse['type_id'],
+            $requestResponse['is_free_match'],
             $requestResponse['currency_id'],
             $requestResponse['cost'],
             $requestResponse['num_players'],
             $requestResponse['locationData'],
             $requestResponse['userId'],
+            $requestResponse['description'],
             $id
         ));
 

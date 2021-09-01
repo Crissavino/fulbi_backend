@@ -75,7 +75,6 @@
     <script>
         function deleteMatch(matchId) {
             const form = document.getElementById('deleteForm' + matchId)
-            console.log(form)
             form.addEventListener('submit', (event) => {
                 event.preventDefault()
                 Swal.fire({
@@ -86,7 +85,7 @@
                     cancelButtonColor: '#d33',
                     confirmButtonText: '{!! __('general.yesDelete') !!}'
                 }).then((result) => {
-                    if (result) {
+                    if (result.value) {
                         form.submit()
                     }
                 })

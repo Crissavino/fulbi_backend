@@ -79,7 +79,7 @@ class UserController extends Controller
     public function getUserLocation(Request $request)
     {
         $user = User::find($request->user_id);
-        $user->location;
+        $user->player->location;
 
         return response()->json([
             'success' => true,

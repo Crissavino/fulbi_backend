@@ -52,7 +52,8 @@ class EditOneMatchRequest
             ];
         }
 
-        if (!$this->request->cost) {
+        $isFreeMatch = boolval($this->request->is_free_match);
+        if (!$this->request->cost && !$isFreeMatch) {
             return [
                 'success' => false,
                 'message' => __('errors.missingParameter')
@@ -85,10 +86,12 @@ class EditOneMatchRequest
             'when_play' => $this->request->when_play,
             'genre_id' => $this->request->genre_id,
             'type_id' => $this->request->type_id,
+            'is_free_match' => $isFreeMatch,
             'currency_id' => $this->request->currency_id,
             'cost' => $this->request->cost,
             'num_players' => $this->request->num_players,
             'locationData' => $this->request->locationData ? $this->request->locationData : $this->request->location,
+            'description' => $this->request->description,
             'userId' => $this->request->userId,
         ];
     }

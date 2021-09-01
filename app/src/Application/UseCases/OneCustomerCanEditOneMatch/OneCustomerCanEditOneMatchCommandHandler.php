@@ -4,6 +4,7 @@
 namespace App\src\Application\UseCases\OneCustomerCanEditOneMatch;
 
 
+use App\Models\Message;
 use App\src\Domain\Services\ChatService;
 use App\src\Domain\Services\LocationService;
 use App\src\Domain\Services\MatchService;
@@ -66,6 +67,8 @@ class OneCustomerCanEditOneMatchCommandHandler
         $num_players = $parameters['num_players'];
         $locationData = $parameters['locationData'];
         $match = $parameters['match'];
+        $is_free_match = $parameters['is_free_match'];
+        $description = $parameters['description'];
 
         if ($match->location->formatted_address !== $locationData && !is_string($locationData)) {
             $this->locationService->update(
@@ -79,7 +82,7 @@ class OneCustomerCanEditOneMatchCommandHandler
                 $locationData->city,
                 $locationData->place_id,
                 $locationData->formatted_address,
-                false
+                $locationData->is_by_lat_lng
             );
         }
 
@@ -89,8 +92,10 @@ class OneCustomerCanEditOneMatchCommandHandler
             $genre_id,
             $type_id,
             $num_players,
+            $is_free_match,
             $currency_id,
             $cost,
+            $description
         );
 
         return [
@@ -135,7 +140,8 @@ class OneCustomerCanEditOneMatchCommandHandler
             ];
         }
 
-        $currencyId = floatval($command->getCurrencyId());
+        $isFreeMatch = boolval($command->getIsFreeMatch());
+        $currencyId = intval($command->getCurrencyId());
         if (!$currencyId) {
             return [
                 'success' => false,
@@ -143,8 +149,8 @@ class OneCustomerCanEditOneMatchCommandHandler
             ];
         }
 
-        $cost = floatval($command->getCost());
-        if (!$cost) {
+        $cost = doubleval($command->getCost());
+        if (!$cost && !$isFreeMatch) {
             return [
                 'success' => false,
                 'message' => __('errors.missingParameter')
@@ -188,10 +194,12 @@ class OneCustomerCanEditOneMatchCommandHandler
             'when_play' => $whenPlay,
             'genre_id' => $genreId,
             'type_id' => $typeId,
+            'is_free_match' => $isFreeMatch,
             'currency_id' => $currencyId,
             'cost' => $cost,
             'num_players' => $numPlayers,
             'locationData' => $locationData,
+            'description' => $command->getDescription(),
             'userId' => $userId,
             'user' => $user,
             'match' => $match

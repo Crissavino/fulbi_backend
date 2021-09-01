@@ -301,20 +301,15 @@ class AuthController extends Controller
             ]);
         }
 
-        $user->player->location;
+        $user->player->location = Location::find($user->player->location_id);
 
-        $response = response()->json([
+        Log::info(json_encode($user));
+
+        return response()->json([
             'success' => true,
             'user' => $user,
             'message' => 'User fully setted'
         ]);
-
-        Log::info('====== $response ========');
-        Log::info(json_encode($response));
-        Log::info('====== $response ========');
-
-        return $response;
-
     }
 
     /**
@@ -325,7 +320,7 @@ class AuthController extends Controller
     {
 
         $userLocationDetails = $request->userLocationDetails;
-        if (!$userLocationDetails['country'] || !$userLocationDetails['formatted_address'] || !$userLocationDetails['province'] || !$userLocationDetails['city']) {
+        if (!$userLocationDetails['formatted_address']) {
             return [
                 'success' => false,
                 'message' => 'Error during save of user locations'
@@ -341,8 +336,8 @@ class AuthController extends Controller
     protected function saveUserLocation($user, $userLocationDetails): array
     {
         try {
-            if ($user->location) {
-                $location = Location::find($user->location->id)->update([
+            if ($user->player->location) {
+                Location::find($user->player->location->id)->update([
                     'lat' => $userLocationDetails['lat'],
                     'lng' => $userLocationDetails['lng'],
                     'country' => $userLocationDetails['country'],
@@ -353,6 +348,7 @@ class AuthController extends Controller
                     'place_id' => $userLocationDetails['place_id'],
                     'formatted_address' => $userLocationDetails['formatted_address']
                 ]);
+                $location = Location::find($user->player->location->id);
             } else {
                 $location = Location::create([
                     'lat' => $userLocationDetails['lat'],

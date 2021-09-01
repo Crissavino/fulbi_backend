@@ -66,7 +66,7 @@ class UserController extends Controller
     {
         $user = $request->user();
         $userLocationDetails = $request->userLocationDetails;
-        if (!$userLocationDetails['country'] || !$userLocationDetails['formatted_address'] || !$userLocationDetails['province'] || !$userLocationDetails['city']) {
+        if (!$userLocationDetails['formatted_address']) {
             return [
                 'success' => false,
                 'message' => 'Error during save of user locations'
@@ -97,8 +97,8 @@ class UserController extends Controller
     protected function saveUserLocation($user, $userLocationDetails): array
     {
         try {
-            if ($user->location) {
-                $location = Location::find($user->location->id)->update([
+            if ($user->player->location) {
+                Location::find($user->player->location->id)->update([
                     'lat' => $userLocationDetails['lat'],
                     'lng' => $userLocationDetails['lng'],
                     'country' => $userLocationDetails['country'],
@@ -109,6 +109,7 @@ class UserController extends Controller
                     'place_id' => $userLocationDetails['place_id'],
                     'formatted_address' => $userLocationDetails['formatted_address']
                 ]);
+                $location = Location::find($user->player->location->id);
             } else {
                 $location = Location::create([
                     'lat' => $userLocationDetails['lat'],

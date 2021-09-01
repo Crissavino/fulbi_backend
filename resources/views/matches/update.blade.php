@@ -1,6 +1,57 @@
 @extends('layouts.app', ['activePage' => 'matches.update', 'titlePage' => __('matches.title')])
 
+<style>
+    .mapContainer {
+        position: relative;
+        height: 600px;
+        margin: 100px 100px 100px 20px;
+        /*display: none;*/
+        display: block;
+    }
+
+    .close-map-button {
+        left: 10px;
+    }
+
+    .success-map-button {
+        margin-left: 20px !important;
+    }
+
+    .content {
+        /*display: block;*/
+        display: none;
+    }
+
+    .map {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        height: 100%;
+        width: 100%;
+        overflow: visible;
+        box-shadow: 0 4px 14px -4px rgba(0, 0, 0, 0.2);
+        border-radius: 12px;
+    }
+
+    .description {
+        border: 1px solid #00bcd4 !important;
+        border-radius: 12px !important;
+        padding-left: 10px;
+    }
+
+</style>
+
 @section('content')
+    <div class="mapContainer">
+        <button class="text-white btn btn-primary btn-lg close-map-button"
+                onclick="closeMap()">{{__('matches.back')}}</button>
+
+        <button class="text-white btn btn-success btn-lg success-map-button"
+                onclick="selectLocation()">Select location</button>
+
+        <div id="map" class="map"></div>
+    </div>
+
     <div class="content">
         <div class="container-fluid">
             <div class="row text-center">
@@ -48,11 +99,12 @@
                                 <div class="row mt-5">
                                     <div class="col-12 col-md-6">
                                         <label for="wherePlay" class="label-control">{{__('matches.wherePlay')}}</label>
-                                        <input type="text" class="form-control" id="wherePlay" value="{{$match->location->formatted_address}}" name="location" required>
+                                        <input type="text" class="form-control" id="wherePlay" value="{{$match->location->lat}} - {{$match->location->lng}}" name="location" required>
+                                        <input type="text" class="d-none" id="locationData" name="locationData">
                                     </div>
                                     <div class="col-12 col-md-6 mt-3 mt-sm-0">
                                         <label for="whenPlay" class="label-control">{{__('matches.whenPlay')}}</label>
-                                        <input type="text" class="form-control datetimepicker" id="whenPlay" name="when_play" required>
+                                        <input type="text" class="form-control datetimepicker" id="whenPlay" name="when_play" required autocomplete="off">
                                     </div>
                                 </div>
 
@@ -64,7 +116,7 @@
                                             @foreach ($genres as $genre)
                                                 <div class="col-3 form-check form-check-radio">
                                                     <label class="form-check-label">
-                                                        <input class="form-check-input" @if($genre->id === $match->genre->id) checked @endif required type="radio" name="genre_id" id="genre" value="{{$genre->id}}" >
+                                                        <input class="form-check-input" @if($genre->id === $match->genre->id) checked @endif required type="radio" name="genre_id" id="genre{{$genre->id}}" value="{{$genre->id}}" >
                                                         {{__($genre->name_key)}}
                                                         <span class="circle">
                                                             <span class="check"></span>
@@ -76,13 +128,13 @@
                                     </div>
 
                                     <div class="col-12 col-md-6">
-                                        <label for="whenPlay" class="label-control">{{__('matches.matchType')}}</label>
+                                        <label for="type" class="label-control">{{__('matches.matchType')}}</label>
 
                                         <div class="row m-auto">
                                             @foreach ($types as $type)
                                                 <div class="col-3 form-check form-check-radio">
                                                     <label class="form-check-label">
-                                                        <input class="form-check-input" @if($type->id === $match->type->id) checked @endif required type="radio" name="type_id" id="type" value="{{$type->id}}" >
+                                                        <input class="form-check-input" @if($type->id === $match->type->id) checked @endif required type="radio" name="type_id" id="type{{$type->id}}" value="{{$type->id}}" >
                                                         {{__($type->name_key)}}
                                                         <span class="circle">
                                                             <span class="check"></span>
@@ -96,19 +148,41 @@
 
                                 <div class="row mt-5">
                                     <div class="col-2 col-md-1">
-                                        <select class="form-control" name="currency_id" id="">
+                                        <select class="form-control currency-select" name="currency_id" id="">
                                             @foreach ($currencies as $currency)
-                                                <option @if($currency->id === $match->currency->id) selected @endif value="{{$currency->id}}">{{$currency->symbol}}</option>
+                                                <option
+                                                    @if($currency->id === $match->currency->id) selected @endif
+                                                    @if($currency->id === $match->currency->id && $match->is_free_match) selected @endif
+                                                    @if($currency->id !== $match->currency->id && $match->is_free_match) disabled @endif
+                                                    value="{{$currency->id}}">
+                                                    {{$currency->symbol}}
+                                                </option>
                                             @endforeach
                                         </select>
                                     </div>
-                                    <div class="col-10 col-md-5">
+                                    <div class="col-4">
                                         <label for="cost" class="label-control">{{__('matches.matchCost')}}</label>
-                                        <input type="number" min="0" class="form-control" id="cost" value="{{$match->cost}}" name="cost" step=".01" required>
+                                        <input type="number" min="0" class="form-control cost" id="cost"
+                                               @if($match->is_free_match) readonly @endif
+                                               value="{{$match->cost}}" name="cost" step=".1" required>
                                     </div>
-                                    <div class="col-12 col-md-6 mt-3 mt-sm-0">
+                                    <div>
+                                        <label for="isFreeMatch">Free</label>
+                                        <input class="form-control" type="checkbox" name="is_free_match" id="isFreeMatch" value="false" onchange="checkFreeMatch(this)" @if($match->is_free_match) checked  @endif>
+                                    </div>
+                                    <div class="col-10 offset-1 col-md-4 mt-3 mt-sm-0">
                                         <label for="numPlayers" class="label-control">{{__('matches.matchNumPlayers')}}</label>
                                         <input type="number" min="1" max="40" class="form-control" id="numPlayers" value="{{$match->num_players}}" name="num_players" required>
+                                    </div>
+                                </div>
+
+                                <div class="row mt-5">
+                                    <div class="col-12">
+                                        <textarea style="padding-left: 10px;"
+                                                  class="form-control border-info description" name="description"
+                                                  id="description" cols="30" rows="10"
+                                                  placeholder="Description (optional)">
+                                        </textarea>
                                     </div>
                                 </div>
 
@@ -127,9 +201,9 @@
     </div>
 @endsection
 @push('js')
-    <script async
-            src="https://maps.googleapis.com/maps/api/js?key={{$apiKey}}&libraries=places&callback=initialize">
-    </script>
+    <script src="https://api.mapbox.com/mapbox-gl-js/v2.4.1/mapbox-gl.js"></script>
+    <script
+        src="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v4.7.2/mapbox-gl-geocoder.min.js"></script>
 
     <script>
         $('.datetimepicker').datetimepicker({
@@ -150,69 +224,151 @@
 
         $('.datetimepicker').val('{{$when_play}}')
 
-        const AK = '{{$apiKey}}'
-        function initialize() {
-            const options = {
-                fields: ["formatted_address", "geometry", "name", "address_components", "place_id"],
-            };
-            const input = document.getElementById('wherePlay')
-            const autocomplete = new google.maps.places.Autocomplete(input, options);
-            autocomplete.addListener("place_changed", () => {
+    </script>
 
-                const place = autocomplete.getPlace();
+    <script>
 
-                if (!place.geometry || !place.geometry.location) {
-                    // User entered the name of a Place that was not suggested and
-                    // pressed the Enter key, or the Place Details request failed.
-                    window.alert("No details available for input: '" + place.name + "'");
-                    return;
-                }
+        let locationData = JSON.parse(`{!! $locationData !!}`);
+        let textToInput  = `${Math.round(locationData.lat * 1000) / 1000} - ${Math.round(locationData.lng * 1000) / 1000}`
+        document.getElementById('wherePlay').value = textToInput;
+        document.getElementById('description').value = `{!! $match->description !!}`
 
-                let data = {
-                    'lat': place.geometry.location.lat().toString(),
-                    'lng': place.geometry.location.lng().toString(),
-                    'formatted_address': place.formatted_address,
-                    'place_id': place.place_id,
-                }
-                if (place.address_components.length > 0) {
-                    place.address_components.forEach( (val) => {
-                        switch (val.types[0]) {
-                            case "locality":
-                                data.city = val.long_name
-                                break;
-                            case "administrative_area_level_1":
-                                data.province = val.long_name
-                                data.province_code = val.short_name
-                                break;
-                            case "country":
-                                data.country = val.long_name
-                                data.country_code = val.short_name
-                                break;
-                            default:
-                                break;
-                        }
+        window.onload = () => {
+            initMapBox();
+            document.querySelector('.mapContainer').style.display = "none"
+            document.querySelector('.content').style.display = "block"
+        }
 
-                    })
-                }
-                if (!document.getElementById('locationData')) {
-                    let textArea = document.createElement('TEXTAREA')
-                    textArea.setAttribute('name', 'locationData')
-                    textArea.setAttribute('id', 'locationData')
-                    textArea.classList.add('d-none')
-                    textArea.value = '';
-                    textArea.value = JSON.stringify(data);
-                    document.getElementById('form').append(textArea)
-                } else {
-                    let textArea = document.getElementById('locationData');
-                    textArea.value = '';
-                    textArea.value = JSON.stringify(data);
-                    document.getElementById('form').append(textArea)
-                }
+        function checkFreeMatch(element) {
+            if (element.checked) {
+                let currencySelect = document.querySelector('.currency-select')
+                currencySelect.options[0].setAttribute('selected', 'true')
+                currencySelect.options[1].setAttribute('disabled', 'true')
+                currencySelect.options[2].setAttribute('disabled', 'true')
+                let cost = document.querySelector('.cost')
+                cost.value = 0;
+                cost.setAttribute('readonly', 'true')
+            } else {
+                let currencySelect = document.querySelector('.currency-select')
+                currencySelect.options[0].setAttribute('selected', 'true')
+                currencySelect.options[1].removeAttribute('disabled')
+                currencySelect.options[2].removeAttribute('disabled')
+                let cost = document.querySelector('.cost')
+                cost.removeAttribute('readonly')
+            }
+        }
 
+        function initMapBox() {
+            mapboxgl.accessToken = `{{$mapBoxApiKey}}`;
+            let center = [`${locationData.lng}`, `${locationData.lat}`];
+            const map = new mapboxgl.Map({
+                container: 'map', // container ID
+                style: 'mapbox://styles/mapbox/streets-v11', // style URL
+                center: center, // starting position [lng, lat]
+                zoom: 13 // starting zoom
+            });
+
+            const geocoder = new MapboxGeocoder({
+                accessToken: mapboxgl.accessToken,
+                mapboxgl: mapboxgl
+            });
+
+            map.addControl(geocoder);
+
+            const marker = new mapboxgl.Marker({
+                draggable: true
+            })
+                .setLngLat([`${locationData.lng}`, `${locationData.lat}`])
+                .addTo(map);
+
+            async function onDragEnd() {
+                const lngLat = marker.getLngLat();
+                let response = await searchByLngLat(lngLat.lng, lngLat.lat);
+                locationData = formatMapBoxResponse(response);
+            }
+
+            marker.on('dragend', onDragEnd);
+
+            // After the map style has loaded on the page,
+            // add a source layer and default styling for a single point
+            map.on('load', () => {
+                // Listen for the `result` event from the Geocoder // `result` event is triggered when a user makes a selection
+                //  Add a marker at the result's coordinates
+                geocoder.on('result', async ({result}) => {
+                    geocoder.clear();
+                    marker.setLngLat([result.center[0], result.center[1]]).addTo(map);
+                    let response = await searchByLngLat(result.center[0], result.center[1]);
+                    locationData = formatMapBoxResponse(response);
+                });
             });
         }
 
+        function formatMapBoxResponse(response) {
+            let place = response.features[0];
+            const latitude = place.center[1];
+            const longitude = place.center[0];
+            const context = Array.from(place.context);
+
+            const city = context.filter(context => context.id.includes('place'))[0].text
+            const province = context.filter(context => context.id.includes('region'))[0].text
+            const country = context.filter(context => context.id.includes('country'))[0].text
+
+            return {
+                'lat': latitude,
+                'lng': longitude,
+                'formatted_address': place.text,
+                'place_name': place.place_name,
+                'place_id': null,
+                'city': city,
+                'province': province,
+                'province_code': null,
+                'country': country,
+                'country_code': null,
+                'is_by_lat_lng': true,
+            };
+        }
+
+        async function searchByLngLat(lng, lat) {
+            const url = `https://api.mapbox.com/geocoding/v5/mapbox.places/${lng},%20${lat}.json?access_token={{$mapBoxApiKey}}&autocomplete=true`;
+            return await fetch(url)
+                .then(response => response.json())
+                .then(data => data);
+        }
+
+        let wherePlayInput = document.getElementById('wherePlay');
+        wherePlayInput.addEventListener('focusin', () => {
+            let mapContainer = document.querySelector('.mapContainer');
+            let contentDiv = document.querySelector('.content');
+            mapContainer.style.display = "block"
+            contentDiv.style.display = "none"
+            let mapboxGL = document.querySelector('.mapboxgl-canvas');
+            mapboxGL.style.width = "1300px"
+            mapboxGL.style.height = "600px"
+            mapboxGL.setAttribute('width', '2600');
+            mapboxGL.setAttribute('height', '1200');
+            wherePlayInput.blur()
+        })
+
+        function closeMap() {
+            let mapContainer = document.querySelector('.mapContainer');
+            let contentDiv = document.querySelector('.content');
+            mapContainer.style.display = "none"
+            contentDiv.style.display = "block"
+        }
+
+        function selectLocation() {
+            let mapContainer = document.querySelector('.mapContainer');
+            let contentDiv = document.querySelector('.content');
+            mapContainer.style.display = "none"
+            contentDiv.style.display = "block"
+
+            let locationDataInput = document.getElementById('locationData');
+            locationDataInput.value = JSON.stringify(locationData);
+            textToInput = `${Math.round(locationData.lat * 1000) / 1000} - ${Math.round(locationData.lng * 1000) / 1000}`
+            let wherePlayInput = document.getElementById('wherePlay');
+            wherePlayInput.value = textToInput;
+        }
     </script>
-    {{--    <script src="{{asset('js/createMatch.js')}}"></script>--}}
+
 @endpush
 

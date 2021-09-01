@@ -45,14 +45,15 @@ class CreateOneMatchRequest
             ];
         }
 
-        if (!$this->request->cost) {
+        if (!$this->request->currency_id) {
             return [
                 'success' => false,
                 'message' => __('errors.missingParameter')
             ];
         }
 
-        if (!$this->request->currency_id) {
+        $isFreeMatch = boolval($this->request->is_free_match);
+        if (!$this->request->cost && !$isFreeMatch) {
             return [
                 'success' => false,
                 'message' => __('errors.missingParameter')
@@ -85,10 +86,12 @@ class CreateOneMatchRequest
             'when_play' => $this->request->when_play,
             'genre_id' => $this->request->genre_id,
             'type_id' => $this->request->type_id,
+            'is_free_match' => $isFreeMatch,
             'currency_id' => $this->request->currency_id,
             'cost' => $this->request->cost,
             'num_players' => $this->request->num_players,
             'locationData' => $this->request->locationData,
+            'description' => $this->request->description,
             'userId' => $this->request->userId,
         ];
     }

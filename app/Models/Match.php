@@ -32,7 +32,7 @@ class Match extends Model
     }
 
     public function currency() {
-        return $this->belongsTo(Location::class);
+        return $this->belongsTo(Currency::class);
     }
 
     public function genre() {

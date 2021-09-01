@@ -14,26 +14,32 @@ class OneCustomerCanCreateOneMatchCommand
     private $locationData;
     private $userId;
     private $currency_id;
+    private $description;
+    private $is_free_match;
 
     /**
      * OneCustomerCanCreateOneMatchCommand constructor.
      * @param $when_play
      * @param $genre_id
      * @param $type_id
+     * @param $is_free_match
      * @param $currency_id
      * @param $cost
      * @param $num_players
      * @param $locationData
+     * @param $description
      * @param $userId
      */
     public function __construct(
         $when_play,
         $genre_id,
         $type_id,
+        $is_free_match,
         $currency_id,
         $cost,
         $num_players,
         $locationData,
+        $description,
         $userId
     )
     {
@@ -45,6 +51,24 @@ class OneCustomerCanCreateOneMatchCommand
         $this->locationData = $locationData;
         $this->userId = $userId;
         $this->currency_id = $currency_id;
+        $this->description = $description;
+        $this->is_free_match = $is_free_match;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getIsFreeMatch()
+    {
+        return $this->is_free_match;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getDescription()
+    {
+        return $this->description;
     }
 
     /**
