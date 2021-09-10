@@ -85,6 +85,9 @@ Route::group(['middleware' => 'auth'], function () {
     Route::get('match/enrolled/{id}', ['as' => 'matches.enrolled', 'uses' => 'MatchController@enrolled']);
 
     Route::get('players', ['as' => 'players.all', 'uses' => 'PlayerController@showAll']);
+    Route::get('player/edit/{id}', ['as' => 'players.edit', 'uses' => 'PlayerController@edit']);
+    Route::post('player/edit/{id}', ['as' => 'players.update', 'uses' => 'PlayerController@update']);
+    Route::get('all-match-players', ['as' => 'players.allMatchPlayers', 'uses' => 'PlayerController@showAllMatchPlayers']);
 });
 
 Route::get('/user/recover-password/{encryptedId}',[AuthController::class, 'showRecoverPassword'])->name('recover-password');

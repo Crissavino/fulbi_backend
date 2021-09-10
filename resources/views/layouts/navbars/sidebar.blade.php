@@ -25,6 +25,12 @@
                     <p>{{ __('sidebar.matches') }}</p>
                 </a>
             </li>
+            <li class="nav-item{{ $activePage == 'players.allMatchPlayers' ? ' active' : '' }}">
+                <a class="nav-link" href="{{ route('players.allMatchPlayers') }}">
+                    <i class="material-icons">people</i>
+                    <p>{{ __('sidebar.all-match-players') }}</p>
+                </a>
+            </li>
             <li class="nav-item{{ $activePage == 'players.index' ? ' active' : '' }}">
                 <a class="nav-link" href="{{ route('players.all') }}">
                     <i class="material-icons">people</i>

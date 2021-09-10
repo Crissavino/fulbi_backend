@@ -1,4 +1,4 @@
-@extends('layouts.app', ['activePage' => 'players.index', 'titlePage' => __('matches.title')])
+@extends('layouts.app', ['activePage' => 'players.allMatchPlayers', 'titlePage' => __('matches.title')])
 
 @section('content')
     <div class="content">
@@ -16,7 +16,7 @@
                     <div class="card">
                         <div class="card-header card-header-primary">
                             <h4 class="card-title ">{{__('general.players')}}</h4>
-                            <p class="card-category">{{__('general.allPlayers')}}</p>
+                            <p class="card-category">{{__('general.yourPlayers')}}</p>
                         </div>
                         <div class="card-body">
                             <div class="table-responsive">
@@ -34,9 +34,6 @@
                                             <td>{{$player->user->name}}</td>
                                             <td>{{$player->user->nickname}}</td>
                                             <td class="td-actions text-right">
-                                                <a href="{{route('players.edit', ['id' => $player->id])}}" type="button" rel="tooltip" class="btn btn-primary btn-round mr-2">
-                                                    <i class="material-icons">edit</i>
-                                                </a>
                                                 <button data-toggle="modal" data-target="#profileModal{{$player->id}}" type="button" rel="tooltip" class="btn btn-primary btn-round text-white">
                                                     <i class="material-icons">visibility</i>
                                                 </button>
