@@ -14,8 +14,7 @@ class PlayerController extends Controller
         $players = Player::with('user')
             ->whereHas('user', function ($query) {
                 $query->where('is_fully_set', 1);
-            })
-            ->get();
+            })->simplePaginate(8);
 
         return view('players.index', [
             'players' => $players
