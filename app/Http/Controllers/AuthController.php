@@ -318,8 +318,8 @@ class AuthController extends Controller
     protected function validateCompleteProfile(Request $request)
     {
 
-        // $userLocationDetails = $request->userLocationDetails;
-        $userLocationDetails = json_decode($request->userLocationDetails, true);
+         $userLocationDetails = $request->userLocationDetails;
+//        $userLocationDetails = json_decode($request->userLocationDetails, true);
         if (!$userLocationDetails['formatted_address']) {
             return [
                 'success' => false,
