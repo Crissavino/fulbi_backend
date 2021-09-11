@@ -276,6 +276,7 @@ class AuthController extends Controller
                 'error' => $saveUserLocationResponse['error']
             ]);
         }
+        $user->player->location = $saveUserLocationResponse['location'];
 
 //        $saveUserDaysAvailablesResponse = $this->saveUserDaysAvailables($daysAvailables, $user);
 //        if (!$saveUserDaysAvailablesResponse['success']) {
@@ -301,8 +302,6 @@ class AuthController extends Controller
             ]);
         }
 
-        $user->player->location = Location::find($user->player->location_id);
-
         Log::info(json_encode($user));
 
         return response()->json([
@@ -319,7 +318,8 @@ class AuthController extends Controller
     protected function validateCompleteProfile(Request $request)
     {
 
-        $userLocationDetails = $request->userLocationDetails;
+        // $userLocationDetails = $request->userLocationDetails;
+        $userLocationDetails = json_decode($request->userLocationDetails, true);
         if (!$userLocationDetails['formatted_address']) {
             return [
                 'success' => false,
@@ -369,6 +369,7 @@ class AuthController extends Controller
 
             return [
                 'success' => true,
+                'location' => $location
             ];
         } catch (\Exception $exception) {
             Log::info('Error during save of user location', [$exception->getMessage()]);

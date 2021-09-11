@@ -80,7 +80,7 @@ class UserController extends Controller
                 'error' => $saveUserLocationResponse['error']
             ]);
         }
-        $user->player->location;
+        $user->player->location = $saveUserLocationResponse['location'];
 
         return response()->json([
             'success' => true,
@@ -129,7 +129,8 @@ class UserController extends Controller
             ]);
 
             return [
-                'success' => true
+                'success' => true,
+                'location' => $location
             ];
         } catch (\Exception $exception) {
             Log::info('Error during save of user location', [$exception->getMessage()]);
