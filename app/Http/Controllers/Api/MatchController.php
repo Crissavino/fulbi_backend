@@ -286,7 +286,7 @@ class MatchController extends Controller
             'genre' => Genre::find($match->genre_id),
             'type' => Type::find($match->type_id),
             'currency' => Currency::find($match->currency_id),
-            'players_enrolled' => $match->players()->with(['user'])->where('is_existing_player', 0)->get()->pluck('user')->count()
+            'players_enrolled' => $match->players()->where('is_confirmed', true)->with(['user'])->where('is_existing_player', 0)->get()->pluck('user')->count()
         ]);
     }
 
