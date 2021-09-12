@@ -31,7 +31,7 @@ class MatchController extends Controller
     const MIX_GENRE_ID = 3;
     const MAX_FREE_MATCHES = 5;
     const MAX_FREE_MATCHES_BY_WEEK = 3;
-    const HOURS_PAST_MATCHES_STAY = 2;
+    const HOURS_PAST_MATCHES_STAY = 3;
 
     public function store(Request $request)
     {
