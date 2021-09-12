@@ -14,10 +14,11 @@ class PlayerController extends Controller
         $players = Player::with('user')
             ->whereHas('user', function ($query) {
                 $query->where('is_fully_set', 1);
-            })->simplePaginate(8);
+            });
 
         return view('players.index', [
-            'players' => $players
+            'players' => $players->simplePaginate(8),
+            'players_total' => $players->count()
         ]);
 
     }
