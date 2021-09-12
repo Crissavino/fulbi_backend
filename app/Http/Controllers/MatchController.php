@@ -187,7 +187,7 @@ class MatchController extends Controller
     public function enrolled($id)
     {
         $match = Match::find($id);
-        $players = $match->players;
+        $players = $match->players()->where('is_confirmed', true)->with(['user'])->where('is_existing_player', 0)->get();
 
         return view('matches.enrolled', [
             'match' => $match,
