@@ -54,13 +54,14 @@ class PlayerController extends Controller
         // $matches = Match::where('owner_id', auth()->user()->id)->get();
         $matches = Match::all();
 
-        $players = [];
+        $allPlayers = [];
         foreach ($matches as $match) {
-            foreach ($match->players as $player) {
-                $players[$player->id] = $player;
+            $players = $match->players()->where('is_confirmed', true)->with(['user'])->where('is_existing_player', 0)->get();
+            foreach ($players as $player) {
+                $allPlayers[$player->id] = $player;
             }
         }
-        $collect = collect($players);
+        $collect = collect($allPlayers);
 
         return view('players.allMatchPlayers', [
             'players' => $collect->unique()
