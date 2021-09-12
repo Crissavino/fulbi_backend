@@ -17,6 +17,7 @@
                         <div class="card-header card-header-primary">
                             <h4 class="card-title ">{{__('general.players')}}</h4>
                             <p class="card-category">{{__('general.allPlayers')}}</p>
+                            <h5 class="card-category font-weight-bold text-right">{{ $players->count() }}</h5>
                         </div>
                         <div class="card-body">
                             <div class="table-responsive">
