@@ -282,6 +282,7 @@ class MatchController extends Controller
         return response()->json([
             'success' => true,
             'match' => $match,
+            'owner' => $match->owner()->with(['player'])->first(),
             'location' => Location::find($match->location_id),
             'genre' => Genre::find($match->genre_id),
             'type' => Type::find($match->type_id),
