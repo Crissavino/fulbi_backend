@@ -1,6 +1,24 @@
 @extends('layouts.app', ['activePage' => 'dashboard', 'titlePage' => __('Fulbito Dashboard')])
 
 @section('content')
+    <style>
+
+        .card .map {
+            height: 500px;
+            border-radius: 6px;
+            margin-top: 15px;
+        }
+
+        .map {
+            top: 0;
+            bottom: 0;
+            height: 100%;
+            width: 100%;
+            overflow: visible;
+            box-shadow: 0 4px 14px -4px rgba(0, 0, 0, 0.2);
+            border-radius: 12px;
+        }
+    </style>
     <div class="content">
         <div class="container-fluid">
             <div class="row">
@@ -116,6 +134,100 @@
                         <div class="card-footer">
                             <div class="stats">
                                 <i class="material-icons">access_time</i> campaign sent 2 days ago
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="card card-chart">
+                        <div class="card-header card-header-success">
+                            <h3 class="text-center font-weight-bold">User by country</h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table">
+                                    <thead class=" text-primary">
+                                    <th>Country</th>
+                                    <th>Players</th>
+                                    </thead>
+                                    <tbody>
+                                    @foreach ($byCountry as $country => $locations)
+                                        <tr>
+                                            <td>
+                                                @if(empty($country))
+                                                    Unknown
+                                                @else
+                                                    {{$country}}
+                                                @endif
+                                            </td>
+                                            <td>{{$locations->count()}}</td>
+                                        </tr>
+                                    @endforeach
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card card-chart">
+                        <div class="card-header card-header-danger">
+                            <h3 class="text-center font-weight-bold">User by province</h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table">
+                                    <thead class=" text-primary">
+                                    <th>Province</th>
+                                    <th>Players</th>
+                                    </thead>
+                                    <tbody>
+                                    @foreach ($byProvince as $province => $locations)
+                                        <tr>
+                                            <td>
+                                                @if(empty($province))
+                                                Unknown
+                                                @else
+                                                {{$province}}
+                                                @endif
+                                            </td>
+                                            <td>{{$locations->count()}}</td>
+                                        </tr>
+                                    @endforeach
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card card-chart">
+                        <div class="card-header card-header-warning">
+                            <h3 class="text-center font-weight-bold">User by city</h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table">
+                                    <thead class=" text-primary">
+                                    <th>City</th>
+                                    <th>Players</th>
+                                    </thead>
+                                    <tbody>
+                                    @foreach ($byCity as $city => $locations)
+                                        <tr>
+                                            <td>
+                                                @if(empty($city))
+                                                    Unknown
+                                                @else
+                                                    {{$city}}
+                                                @endif </td>
+                                            <td>{{$locations->count()}}</td>
+                                        </tr>
+                                    @endforeach
+                                    </tbody>
+                                </table>
                             </div>
                         </div>
                     </div>

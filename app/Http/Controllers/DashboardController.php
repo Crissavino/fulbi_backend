@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Device;
 use App\Models\Match;
+use App\Models\Player;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -26,6 +27,8 @@ class DashboardController extends Controller
         $iosChartData = $this->getIosChartData();
         $androidChartData = $this->getAndroidChartData();
 
+        list($byCountry, $byProvince, $byCity) = $this->groupUserLocations();
+
         return view('dashboard', [
             'users' => User::all(),
             'newUsersThisWeek' => $newUsersThisWeek,
@@ -37,7 +40,10 @@ class DashboardController extends Controller
             'androidThisWeek' => $androidThisWeek,
             'matchesChartData' => $matchesChartData,
             'iosChartData' => $iosChartData,
-            'androidChartData' => $androidChartData
+            'androidChartData' => $androidChartData,
+            'byCountry' => $byCountry,
+            'byProvince' => $byProvince,
+            'byCity' => $byCity,
         ]);
     }
 
@@ -160,5 +166,28 @@ class DashboardController extends Controller
         $saturday = Carbon::now()->startOfWeek()->nextWeekday()->nextWeekday()->nextWeekday()->nextWeekday()->nextWeekday();
         $sunday = Carbon::now()->startOfWeek()->nextWeekday()->nextWeekday()->nextWeekday()->nextWeekday()->nextWeekday()->nextWeekday();
         return array($monday, $tuesday, $wednesday, $thursday, $friday, $saturday, $sunday);
+    }
+
+    /**
+     * @return array
+     */
+    private function groupUserLocations(): array
+    {
+        $byCountry = Player::with(['location'])->get()->pluck('location')->reject(function ($location) {
+            return empty($location);
+        })->groupBy('country');
+        $byCountry->all();
+
+        $byProvince = Player::with(['location'])->get()->pluck('location')->reject(function ($location) {
+            return empty($location);
+        })->groupBy('province');
+        $byProvince->all();
+
+        $byCity = Player::with(['location'])->get()->pluck('location')->reject(function ($location) {
+            return empty($location);
+        })->groupBy('city');
+        $byCity->all();
+
+        return array($byCountry, $byProvince, $byCity);
     }
 }

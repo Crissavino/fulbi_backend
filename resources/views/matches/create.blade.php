@@ -218,7 +218,6 @@
         }
 
         function checkFreeMatch(element) {
-            console.log(element)
             if (element.checked) {
                 let currencySelect = document.querySelector('.currency-select')
                 currencySelect.options[0].setAttribute('selected', 'true')
