@@ -175,17 +175,17 @@ class DashboardController extends Controller
     {
         $byCountry = Player::with(['location'])->get()->pluck('location')->reject(function ($location) {
             return empty($location);
-        })->groupBy('country');
+        })->groupBy('country')->sortDesc();
         $byCountry->all();
 
         $byProvince = Player::with(['location'])->get()->pluck('location')->reject(function ($location) {
             return empty($location);
-        })->groupBy('province');
+        })->groupBy('province')->sortDesc();
         $byProvince->all();
 
         $byCity = Player::with(['location'])->get()->pluck('location')->reject(function ($location) {
             return empty($location);
-        })->groupBy('city');
+        })->groupBy('city')->sortDesc();
         $byCity->all();
 
         return array($byCountry, $byProvince, $byCity);
