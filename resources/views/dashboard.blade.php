@@ -233,6 +233,50 @@
                     </div>
                 </div>
             </div>
+
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="card card-chart">
+                        <div class="card-header card-header-success">
+                            <h3 class="text-center font-weight-bold">Last 10 users</h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table">
+                                    <thead class=" text-primary">
+                                    <th>Id</th>
+                                    <th>Name</th>
+                                    <th>Email</th>
+                                    <th>City</th>
+                                    <th>Country</th>
+                                    </thead>
+                                    <tbody>
+                                    @foreach ($lastTenPlayers as $player)
+                                        <tr>
+                                            <td>
+                                                {{$player->user->id}}
+                                            </td>
+                                            <td>
+                                                {{$player->user->name}}
+                                            </td>
+                                            <td>
+                                                {{$player->user->email}}
+                                            </td>
+                                            <td>
+                                                {{$player->location->city}}
+                                            </td>
+                                            <td>
+                                                {{$player->location->country}}
+                                            </td>
+                                        </tr>
+                                    @endforeach
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 @endsection

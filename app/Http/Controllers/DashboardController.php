@@ -26,6 +26,7 @@ class DashboardController extends Controller
         $matchesChartData = $this->getMatchesChartData();
         $iosChartData = $this->getIosChartData();
         $androidChartData = $this->getAndroidChartData();
+        $lastTenPlayers = $this->getLastTenPlayers();
 
         list($byCountry, $byProvince, $byCity) = $this->groupUserLocations();
 
@@ -44,6 +45,7 @@ class DashboardController extends Controller
             'byCountry' => $byCountry,
             'byProvince' => $byProvince,
             'byCity' => $byCity,
+            'lastTenPlayers' => $lastTenPlayers
         ]);
     }
 
@@ -189,5 +191,13 @@ class DashboardController extends Controller
         $byCity = $byCity->take(10);
 
         return array($byCountry, $byProvince, $byCity);
+    }
+
+    private function getLastTenPlayers()
+    {
+        return Player::with(['location', 'user'])->get()->reject(function ($player) {
+            return empty($player->location);
+        })->sortByDesc('created_at')->chunk(10)->first();
+
     }
 }
