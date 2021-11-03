@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Jobs\SendCreateMatchNotification;
 use App\Models\Currency;
 use App\Models\Device;
 use App\Models\Genre;
@@ -74,7 +75,7 @@ class MatchController extends Controller
                 ];
             }
         }
-//        $locationData = json_decode($locationData, true);
+        // $locationData = json_decode($locationData, true);
 
         $location = (new EloquentLocationService())->create(
             $locationData['lat'],
@@ -147,39 +148,7 @@ class MatchController extends Controller
                 }
             }
 
-            if(!empty($userDevicesTokensEn)) {
-                App::setLocale('en');
-                FcmPushNotificationsService::sendMatchCreated(
-                    __('notifications.match.created'),
-                    [],
-                    $userDevicesTokensEn
-                );
-
-                FcmPushNotificationsService::sendSilence(
-                    'silence_match_created',
-                    [
-                        'match_id' => $match->id
-                    ],
-                    $userDevicesTokensEn
-                );
-            }
-
-            if(!empty($userDevicesTokensEs)) {
-                App::setLocale('es');
-                FcmPushNotificationsService::sendMatchCreated(
-                    __('notifications.match.created'),
-                    [],
-                    $userDevicesTokensEs
-                );
-
-                FcmPushNotificationsService::sendSilence(
-                    'silence_match_created',
-                    [
-                        'match_id' => $match->id
-                    ],
-                    $userDevicesTokensEs
-                );
-            }
+            SendCreateMatchNotification::dispatch($match->id, $userDevicesTokensEs, $userDevicesTokensEn);
         });
 
         Message::create([
