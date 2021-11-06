@@ -148,7 +148,7 @@ class MatchController extends Controller
                 }
             }
 
-            SendCreateMatchNotification::dispatch($match->id, $userDevicesTokensEs, $userDevicesTokensEn);
+            SendCreateMatchNotification::dispatchAfterResponse($match->id, $userDevicesTokensEs, $userDevicesTokensEn);
         });
 
         Message::create([
