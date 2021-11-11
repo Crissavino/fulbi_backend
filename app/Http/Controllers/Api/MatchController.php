@@ -51,8 +51,8 @@ class MatchController extends Controller
         $num_players = $parameters['num_players'];
         $locationData = $parameters['locationData'];
         $description = $parameters['description'];
-        //$user = $parameters['user'];
-        $user = User::find(3);
+        $user = $parameters['user'];
+//        $user = User::find(3);
         if (!$user->premium) {
             if ($user->matches_created >= self::MAX_FREE_MATCHES) {
                 Log::info('========== maxMatchesReached =============');
@@ -76,7 +76,7 @@ class MatchController extends Controller
                 ];
             }
         }
-         $locationData = json_decode($locationData, true);
+//         $locationData = json_decode($locationData, true);
 
         $location = (new EloquentLocationService())->create(
             $locationData['lat'],
