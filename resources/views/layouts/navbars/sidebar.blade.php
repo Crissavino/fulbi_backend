@@ -37,6 +37,12 @@
                     <p>{{ __('sidebar.players') }}</p>
                 </a>
             </li>
+            <li class="nav-item{{ $activePage == 'players.index' ? ' active' : '' }}">
+                <a class="nav-link" href="{{ route('organization.all') }}">
+                    <i class="material-icons">people</i>
+                    <p>{{ __('sidebar.organization') }}</p>
+                </a>
+            </li>
         </ul>
     </div>
 </div>

@@ -302,9 +302,9 @@ class UserController extends Controller
     {
         return response()->json([
             'success' => true,
-            'versionMajor' => 1,
-            'versionMinor' => 2,
-            'versionPatch' => 9,
+            'versionMajor' => 2,
+            'versionMinor' => 0,
+            'versionPatch' => 0,
             'checkVersion' => true,
         ]);
     }
