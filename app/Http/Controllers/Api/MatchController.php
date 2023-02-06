@@ -252,6 +252,7 @@ class MatchController extends Controller
         return response()->json([
             'success' => true,
             'match' => $match,
+            'booking' => $match->booking,
             'owner' => $match->owner()->with(['player'])->first(),
             'location' => Location::find($match->location_id),
             'genre' => Genre::find($match->genre_id),
@@ -593,6 +594,13 @@ class MatchController extends Controller
 
         $matches = $matches->sortBy(function($match){
             $match->location;
+            $match->booking;
+            if ($match->booking) {
+                $match->booking->field;
+            }
+            Log::info(json_encode("====== MATCHES ======", JSON_PRETTY_PRINT));
+            Log::info(json_encode($match, JSON_PRETTY_PRINT));
+            Log::info(json_encode("====== MATCHES ======", JSON_PRETTY_PRINT));
             $match->cost = number_format($match->cost, 2);
             $match->participants = $match->players()->where('is_confirmed', true)->with(['user'])->get()->pluck('user');
             return $match->when_play;

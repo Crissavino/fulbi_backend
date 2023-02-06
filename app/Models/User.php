@@ -68,6 +68,10 @@ class User extends Authenticatable
         return $this->hasManyThrough(Position::class, Player::class);
     }
 
+    public function bookings() {
+        return $this->hasMany(Booking::class);
+    }
+
     public function devices()
     {
         return $this->hasMany(Device::class);

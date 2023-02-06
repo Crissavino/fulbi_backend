@@ -18,4 +18,8 @@ class Type extends Model
     public function sport() {
         return $this->belongsTo(Sport::class);
     }
+
+    public function fields() {
+        return $this->belongsToMany(Field::class);
+    }
 }

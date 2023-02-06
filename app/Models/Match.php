@@ -56,6 +56,10 @@ class Match extends Model
         return $this->belongsToMany(Player::class);
     }
 
+    public function booking() {
+        return $this->hasOne(Booking::class);
+    }
+
 //    public function playersWithUser()
 //    {
 //        return $this->belongsToMany(Player::class)->with('user');

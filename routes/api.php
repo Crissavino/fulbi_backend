@@ -1,6 +1,8 @@
 <?php
 
+use App\Http\Controllers\Api\BookingController;
 use App\Http\Controllers\Api\ChatController;
+use App\Http\Controllers\Api\FieldController;
 use App\Http\Controllers\Api\MatchController;
 use App\Http\Controllers\Api\NotificationsController;
 use App\Http\Controllers\AuthController;
@@ -50,6 +52,16 @@ Route::post('/matches/send-invitation-to-user',[MatchController::class, 'sendInv
 Route::post('/matches/join-match-from-invitation-link-new-user',[MatchController::class, 'joinMatchFromInvitationLinkNewUser'])->middleware('auth:sanctum');
 Route::post('/matches/join-match-from-invitation-link-existing-user',[MatchController::class, 'joinMatchFromInvitationLinkExistingUser'])->middleware('auth:sanctum');
 //Match
+
+//Field
+Route::get('/field/{id}',[FieldController::class, 'getField'])->middleware('auth:sanctum');
+Route::post('/field/get-fields-offers',[FieldController::class, 'getFieldsOffers'])->middleware('auth:sanctum');
+//Field
+
+//Booking
+Route::get('/booking/get/{id}',[BookingController::class, 'getBooking'])->middleware('auth:sanctum');
+Route::get('/booking/get-my-bookings',[BookingController::class, 'getMyBookings'])->middleware('auth:sanctum');
+//Booking
 
 // Chat
 Route::post('/chat/send-message',[ChatController::class, 'sendMessage'])->middleware('auth:sanctum');
